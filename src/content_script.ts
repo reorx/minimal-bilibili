@@ -9,6 +9,7 @@ possible settings:
 - font size
 - enable/disable different columns
 - enable/disable scroll to load
+- enable/disable auto focus search bar
 */
 
 
