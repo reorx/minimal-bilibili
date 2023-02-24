@@ -6,10 +6,14 @@ import { formatDate, formatDuration, hoursOrMinutesFrom } from './utils/misc';
 
 /*
 possible settings:
-- font size
-- enable/disable different columns
-- enable/disable scroll to load
-- enable/disable auto focus search bar
+- [ ] enable/disable different columns
+- [ ] enable/disable scroll to load
+- [ ] enable/disable auto focus search bar
+- [ ] font size
+
+TODO:
+- [ ] hover seq number to show preview
+- [ ] column for recommendations
 */
 
 
