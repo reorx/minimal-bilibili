@@ -17,7 +17,7 @@ body {
   .center-search-container {
     position: fixed;
     left: 50%;
-    top: 180px;
+    top: 175px;
     width: var(--search-container-width);
     margin-left: calc(0px - (var(--search-container-width) / 2));
   }
@@ -55,19 +55,29 @@ body {
 .dynamics-container {
   width: 80%;
   margin: 0 auto;
-  margin-top: 80px;
+  margin-top: 85px;
 
   .dynamic-item {
     margin-bottom: 8px;
+    color: #aaa;
 
     a:hover {
       color: var(--brand_blue);
     }
+    .title {
+      color: #333;
+    }
     .seq {
       display: inline-block;
-      width: 20px;
+      width: 40px;
       text-align: right;
-      margin-right: 5px;
+      margin-right: 10px;
     }
+    .with-sep:after {
+      content: "•";
+      display: inline-block;
+      margin: 0 10px;
+    }
+
   }
 }

@@ -127,22 +127,18 @@ fetchDynamics().then(data => {
       const card = _card as VideoCard
       innerHtml = `
         <span class="seq">${dynamicsSeq}</span
-        ><a href="https://www.bilibili.com/video/${desc.bvid} target="_blank">${card.title}</a>
-        —
-        <a href="https://space.bilibili.com/${desc.user_profile?.info.uid}" target="_blank">${desc.user_profile?.info.uname}</a>
-        —
-        <span>${formatDate(card.pubdate)}</span>
-        —
-        <span>${formatDuration(card.duration)}</span>
+        ><a class="with-sep title" href="https://www.bilibili.com/video/${desc.bvid} target="_blank">${card.title}</a
+        ><a class="with-sep" href="https://space.bilibili.com/${desc.user_profile?.info.uid}" target="_blank">${desc.user_profile?.info.uname}</a
+        ><span class="with-sep">${formatDate(card.pubdate)}</span
+        ><span>${formatDuration(card.duration)}</span>
       `
     } else {
       const card = _card as BangumiCard
       console.log('bangumi card', card)
       innerHtml = `
         <span class="seq">${dynamicsSeq}</span
-        ><a href="${card.url}" target="_blank">${card.index}</a>
-        —
-        <span>${card.apiSeasonInfo.title}</span>
+        ><a class="with-sep title" href="${card.url}" target="_blank">${card.index}</a
+        ><span>${card.apiSeasonInfo.title}</span>
       `
     }
 
