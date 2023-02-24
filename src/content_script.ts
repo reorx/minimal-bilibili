@@ -4,14 +4,7 @@ import { colors, getLogger } from './utils/log';
 import { formatDate, formatDuration } from './utils/misc';
 
 
-declare global {
-  interface Window {
-    __pinia: any
-  }
-}
-
 const lg = getLogger('content_script', colors.bgYellowBright)
-
 lg.info('content_script.ts');
 
 setTimeout(() => {
@@ -23,12 +16,19 @@ setTimeout(() => {
 const downloadLink = document.querySelector('.download-client-trigger')
 downloadLink?.parentElement?.remove()
 
-async function fetchDynamics(uid: string, dynamicId: string|undefined): Promise<DynamicData> {
+const TYPE_LIST = {
+  VIDEO: '8',
+  BANGUMI: '512,4097,4098,4099,4100,4101',
+}
+
+async function fetchDynamics(uid: string, dynamicId: string|null, type_list: string): Promise<DynamicData> {
   // see https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/dynamic/get_dynamic_detail.md
   // for type_list values meaning
-  let url = `https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/dynamic_new?uid=${uid}&type_list=8,512,4097,4098,4099,4100,4101`
+  let url
   if (dynamicId) {
-    url += `&offset_dynamic_id=${dynamicId}`
+    url = `https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/dynamic_history?uid=${uid}&type_list=${type_list}&offset_dynamic_id=${dynamicId}`
+  } else {
+    url = `https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/dynamic_new?uid=${uid}&type_list=${type_list}`
   }
 
   const resp = await fetch(url, {
@@ -89,7 +89,7 @@ interface VideoCard {
 }
 
 interface BangumiCard {
-  index: string
+  new_desc: string
   cover: string
   apiSeasonInfo: {
     title: string
@@ -113,31 +113,54 @@ const uidInterval = setInterval(() => {
   const uid = profileLink.href.match(uidRegex)![1]
   console.log('uid', uid)
 
-  const container = initDynamics()
-  loadDynamics(uid, container)
+  // create container
+  const dynamicsParent = $('.bili-feed4')
+  const container = $('<div class="dynamics-container">').appendTo(dynamicsParent)
+
+  // init columns
+  initDynamicsColumn(container, 'left', '视频', uid, TYPE_LIST.VIDEO)
+  initDynamicsColumn(container, 'right', '番剧', uid, TYPE_LIST.BANGUMI)
 }, 100)
 
-function initDynamics() {
-  const dynamicsParent = $('.bili-feed4')
-  return $('<div class="dynamics-container">').appendTo(dynamicsParent)
+
+interface ColumnState {
+  dynamicsSeq: number
+  lastDynamicId: string|null
 }
 
-let dynamicsSeq = 0
-let lastDynamicId: string | undefined
+function initDynamicsColumn(container: Cash, name: string, title: string, uid: string, type_list: string) {
 
-function loadDynamics(uid: string, container: Cash) {
+  const column = $(`<div class="${name}-column">`).appendTo(container)
+  $('<div class="title">').text(title).appendTo(column)
+  const items = $('<div class="items">').appendTo(column)
+  const loadMore = $('<div class="load-more">').text('加载更多').appendTo(column)
 
-  fetchDynamics(uid, lastDynamicId).then(data => {
+  const state: ColumnState = {
+    dynamicsSeq: 0,
+    lastDynamicId: null,
+  }
+
+  loadMore.on('click', async () => {
+    loadMore.attr('disabled', 'disabled')
+    await loadDynamics(state, items, uid, type_list)
+    loadMore.removeAttr('disabled')
+  })
+
+  loadDynamics(state, items, uid, type_list)
+}
+
+async function loadDynamics(state: ColumnState, container: Cash, uid: string, type_list: string) {
+  return fetchDynamics(uid, state.lastDynamicId, type_list).then(data => {
     console.log('data', data)
     for (const item of data.data.cards) {
-      dynamicsSeq++
+      state.dynamicsSeq++
       const desc = item.desc
       const _card = JSON.parse(item.card)
       let innerHtml
       if (desc.bvid) {
         const card = _card as VideoCard
         innerHtml = `
-          <span class="seq">${dynamicsSeq}</span
+          <span class="seq">${state.dynamicsSeq}</span
           ><a class="with-sep title" href="https://www.bilibili.com/video/${desc.bvid} target="_blank">${card.title}</a
           ><a class="with-sep" href="https://space.bilibili.com/${desc.user_profile?.info.uid}" target="_blank">${desc.user_profile?.info.uname}</a
           ><span class="with-sep">${formatDate(card.pubdate)}</span
@@ -147,9 +170,9 @@ function loadDynamics(uid: string, container: Cash) {
         const card = _card as BangumiCard
         console.log('bangumi card', card, item)
         innerHtml = `
-          <span class="seq">${dynamicsSeq}</span
-          ><a class="with-sep title" href="${card.url}" target="_blank">${card.index}</a
-          ><span>${card.apiSeasonInfo.title}</span
+          <span class="seq">${state.dynamicsSeq}</span
+          ><a class="with-sep title" href="${card.url}" target="_blank">${card.new_desc}</a
+          ><span class="with-sep">${card.apiSeasonInfo.title}</span
           ><span class="with-sep">${formatDate(desc.timestamp)}</span>
         `
       }
@@ -157,7 +180,7 @@ function loadDynamics(uid: string, container: Cash) {
       const dynamicItem = $('<div class="dynamic-item">').appendTo(container)
       dynamicItem.html(innerHtml)
 
-      lastDynamicId = desc.dynamic_id_str
+      state.lastDynamicId = desc.dynamic_id_str
     }
   })
 }

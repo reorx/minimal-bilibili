@@ -57,6 +57,10 @@ body {
   margin: 0 auto;
   margin-top: 85px;
 
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+
   .dynamic-item {
     margin-bottom: 8px;
     color: #aaa;
