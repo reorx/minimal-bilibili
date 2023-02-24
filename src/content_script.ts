@@ -4,6 +4,14 @@ import { colors, getLogger } from './utils/log';
 import { formatDate, formatDuration } from './utils/misc';
 
 
+/*
+possible settings:
+- font size
+- enable/disable different columns
+- enable/disable scroll to load
+*/
+
+
 const lg = getLogger('content_script', colors.bgYellowBright)
 lg.info('content_script.ts');
 
@@ -118,8 +126,18 @@ const uidInterval = setInterval(() => {
   const container = $('<div class="dynamics-container">').appendTo(dynamicsParent)
 
   // init columns
-  initDynamicsColumn(container, 'left', '视频', uid, TYPE_LIST.VIDEO)
-  initDynamicsColumn(container, 'right', '番剧', uid, TYPE_LIST.BANGUMI)
+  const loadMoreFuncs: Array<() => Promise<void>> = []
+  loadMoreFuncs.push(
+    initDynamicsColumn(container, 'left', '视频', uid, TYPE_LIST.VIDEO)
+  )
+  loadMoreFuncs.push(
+    initDynamicsColumn(container, 'right', '番剧', uid, TYPE_LIST.BANGUMI)
+  )
+
+  // load more when scroll to bottom
+  detectScrollToBottom(async () => {
+    await Promise.all(loadMoreFuncs.map(f => f()))
+  })
 }, 100)
 
 
@@ -141,16 +159,20 @@ function initDynamicsColumn(container: Cash, name: string, title: string, uid: s
     lastDynamicId: null,
   }
 
-  loadMore.on('click', async () => {
+  const loadMoreFunc = async () => {
     loadMore.attr('disabled', 'disabled')
     await loadDynamics(state, items, uid, type_list)
     loadMore.removeAttr('disabled')
-  })
+  }
+
+  loadMore.on('click', loadMoreFunc)
 
   loadDynamics(state, items, uid, type_list)
+  return loadMoreFunc
 }
 
 async function loadDynamics(state: ColumnState, container: Cash, uid: string, type_list: string) {
+
   return fetchDynamics(uid, state.lastDynamicId, type_list).then(data => {
     console.log('data', data)
     for (const item of data.data.cards) {
@@ -207,4 +229,21 @@ async function loadDynamics(state: ColumnState, container: Cash, uid: string, ty
 
 function spanIcon(icon: string) {
   return `<span class="icon icon--tabler icon--tabler--${icon}"></span>`
+}
+
+function detectScrollToBottom(callback: () => Promise<void>) {
+  let isDoing = false;
+
+  window.addEventListener("scroll", async function () {
+    if (isDoing) return
+
+    const scrollPosition = window.scrollY;
+    const windowSize = window.innerHeight;
+    const fullSize = document.body.scrollHeight;
+    if (scrollPosition + windowSize >= fullSize) {
+      isDoing = true
+      await callback();
+      isDoing = false
+    }
+  });
 }
