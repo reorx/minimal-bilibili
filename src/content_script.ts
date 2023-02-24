@@ -1,4 +1,4 @@
-import $ from 'cash-dom';
+import $, { Cash } from 'cash-dom';
 
 import { colors, getLogger } from './utils/log';
 import { formatDate, formatDuration } from './utils/misc';
@@ -23,27 +23,13 @@ setTimeout(() => {
 const downloadLink = document.querySelector('.download-client-trigger')
 downloadLink?.parentElement?.remove()
 
-
-function injectScript(file: string) {
-  const body = document.getElementsByTagName('body')[0];
-  const s = document.createElement('script');
-  s.setAttribute('type', 'text/javascript');
-  s.setAttribute('src', file);
-  body.appendChild(s);
-}
-
-injectScript(chrome.runtime.getURL('/js/inject.js'))
-
-// get uid
-const profileLink = document.querySelector('.header-entry-mini') as HTMLLinkElement
-const uidRegex = /space\.bilibili\.com\/(\d+)/
-const uid = profileLink.href.match(uidRegex)![1]
-console.log('uid', uid)
-
-async function fetchDynamics(): Promise<DynamicData> {
+async function fetchDynamics(uid: string, dynamicId: string|undefined): Promise<DynamicData> {
   // see https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/dynamic/get_dynamic_detail.md
   // for type_list values meaning
-  const url = `https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/dynamic_new?uid=${uid}&type_list=8,512,4097,4098,4099,4100,4101`
+  let url = `https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/dynamic_new?uid=${uid}&type_list=8,512,4097,4098,4099,4100,4101`
+  if (dynamicId) {
+    url += `&offset_dynamic_id=${dynamicId}`
+  }
 
   const resp = await fetch(url, {
     credentials: 'include',
@@ -60,7 +46,7 @@ interface DynamicData {
         bvid: string
         dynamic_id_str: string
         // e.g. 1677212231
-        timestamp: string
+        timestamp: number
         user_profile?: {
           info: {
             // avatar image url
@@ -112,37 +98,66 @@ interface BangumiCard {
   url: string
 }
 
-const dynamicsParent = $('.bili-feed4')
-const dynamicsContainer = $('<div class="dynamics-container">').appendTo(dynamicsParent)
-let dynamicsSeq = 0
 
-fetchDynamics().then(data => {
-  console.log('data', data)
-  for (const item of data.data.cards) {
-    dynamicsSeq++
-    const desc = item.desc
-    const _card = JSON.parse(item.card)
-    let innerHtml
-    if (desc.bvid) {
-      const card = _card as VideoCard
-      innerHtml = `
-        <span class="seq">${dynamicsSeq}</span
-        ><a class="with-sep title" href="https://www.bilibili.com/video/${desc.bvid} target="_blank">${card.title}</a
-        ><a class="with-sep" href="https://space.bilibili.com/${desc.user_profile?.info.uid}" target="_blank">${desc.user_profile?.info.uname}</a
-        ><span class="with-sep">${formatDate(card.pubdate)}</span
-        ><span>${formatDuration(card.duration)}</span>
-      `
-    } else {
-      const card = _card as BangumiCard
-      console.log('bangumi card', card)
-      innerHtml = `
-        <span class="seq">${dynamicsSeq}</span
-        ><a class="with-sep title" href="${card.url}" target="_blank">${card.index}</a
-        ><span>${card.apiSeasonInfo.title}</span>
-      `
-    }
-
-    const dynamicItem = $('<div class="dynamic-item">').appendTo(dynamicsContainer)
-    dynamicItem.html(innerHtml)
+const uidInterval = setInterval(() => {
+  // keep trying to get profile link
+  const profileLink = document.querySelector('.header-entry-mini') as HTMLLinkElement
+  if (!profileLink) {
+    return
   }
-})
+
+  clearInterval(uidInterval)
+
+  // get uid
+  const uidRegex = /space\.bilibili\.com\/(\d+)/
+  const uid = profileLink.href.match(uidRegex)![1]
+  console.log('uid', uid)
+
+  const container = initDynamics()
+  loadDynamics(uid, container)
+}, 100)
+
+function initDynamics() {
+  const dynamicsParent = $('.bili-feed4')
+  return $('<div class="dynamics-container">').appendTo(dynamicsParent)
+}
+
+let dynamicsSeq = 0
+let lastDynamicId: string | undefined
+
+function loadDynamics(uid: string, container: Cash) {
+
+  fetchDynamics(uid, lastDynamicId).then(data => {
+    console.log('data', data)
+    for (const item of data.data.cards) {
+      dynamicsSeq++
+      const desc = item.desc
+      const _card = JSON.parse(item.card)
+      let innerHtml
+      if (desc.bvid) {
+        const card = _card as VideoCard
+        innerHtml = `
+          <span class="seq">${dynamicsSeq}</span
+          ><a class="with-sep title" href="https://www.bilibili.com/video/${desc.bvid} target="_blank">${card.title}</a
+          ><a class="with-sep" href="https://space.bilibili.com/${desc.user_profile?.info.uid}" target="_blank">${desc.user_profile?.info.uname}</a
+          ><span class="with-sep">${formatDate(card.pubdate)}</span
+          ><span>${formatDuration(card.duration)}</span>
+        `
+      } else {
+        const card = _card as BangumiCard
+        console.log('bangumi card', card, item)
+        innerHtml = `
+          <span class="seq">${dynamicsSeq}</span
+          ><a class="with-sep title" href="${card.url}" target="_blank">${card.index}</a
+          ><span>${card.apiSeasonInfo.title}</span
+          ><span class="with-sep">${formatDate(desc.timestamp)}</span>
+        `
+      }
+
+      const dynamicItem = $('<div class="dynamic-item">').appendTo(container)
+      dynamicItem.html(innerHtml)
+
+      lastDynamicId = desc.dynamic_id_str
+    }
+  })
+}
