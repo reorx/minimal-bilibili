@@ -15,8 +15,8 @@ html body {
 
 body {
   .center-search-container {
-    position: fixed;
-    left: 50%;
+    position: absolute;
+    left: 50vw;
     top: 175px;
     width: var(--search-container-width);
     margin-left: calc(0px - (var(--search-container-width) / 2));
@@ -53,35 +53,83 @@ body {
 /* dynamics content styles */
 
 .dynamics-container {
-  width: 80%;
+  width: 86vw;
   margin: 0 auto;
-  margin-top: 85px;
+  margin-top: 80px;
+  font-size: 15px;
+  padding-bottom: 50px;
 
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 30px;
 
-  .dynamic-item {
-    margin-bottom: 8px;
-    color: #aaa;
+  @media screen and (max-width: 1000px) {
+    width: 100vw;
+    margin-left: 0; margin-right: 0;
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
 
-    a:hover {
-      color: var(--brand_blue);
+  section {
+    > .title {
+      font-size: 20px;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+  }
+
+  .dynamic-item {
+    margin-bottom: 10px;
+    color: #aaa;
+    display: flex;
+
+    .seq {
+      width: 20px;
+      text-align: right;
+      margin-right: 10px;
     }
     .title {
       color: #333;
+      flex-grow: 1;
+      flex-wrap: wrap;
+      a {
+        display: inline-block;
+        padding-bottom: 1px;
+      }
     }
-    .seq {
-      display: inline-block;
-      width: 40px;
-      text-align: right;
-      margin-right: 10px;
+    .meta {
+      font-size: 14px;
+    }
+
+    // styles
+    &:hover {
+      .title a {
+        border-bottom: 1px solid #aaa;
+      }
+      .title a:hover {
+        border-color: var(--brand_blue);
+      }
+    }
+    a:hover {
+      color: var(--brand_blue);
     }
     .with-sep:after {
       content: "•";
       display: inline-block;
       margin: 0 10px;
     }
+  }
 
+  .actions {
+    margin: 30px 0;
+
+    .load-more {
+      margin-left: 20px;
+      padding: 8px 15px;
+      background: #f3f3f3;
+      &:hover {
+        background: #eee;
+      }
+    }
   }
 }

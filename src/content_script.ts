@@ -130,10 +130,11 @@ interface ColumnState {
 
 function initDynamicsColumn(container: Cash, name: string, title: string, uid: string, type_list: string) {
 
-  const column = $(`<div class="${name}-column">`).appendTo(container)
+  const column = $(`<section class="${name}-column">`).appendTo(container)
   $('<div class="title">').text(title).appendTo(column)
   const items = $('<div class="items">').appendTo(column)
-  const loadMore = $('<div class="load-more">').text('加载更多').appendTo(column)
+  const actions = $('<div class="actions">').appendTo(column)
+  const loadMore = $('<button class="load-more">').text('加载更多').appendTo(actions)
 
   const state: ColumnState = {
     dynamicsSeq: 0,
@@ -160,20 +161,34 @@ async function loadDynamics(state: ColumnState, container: Cash, uid: string, ty
       if (desc.bvid) {
         const card = _card as VideoCard
         innerHtml = `
-          <span class="seq">${state.dynamicsSeq}</span
-          ><a class="with-sep title" href="https://www.bilibili.com/video/${desc.bvid} target="_blank">${card.title}</a
-          ><a class="with-sep" href="https://space.bilibili.com/${desc.user_profile?.info.uid}" target="_blank">${desc.user_profile?.info.uname}</a
-          ><span class="with-sep">${formatDate(card.pubdate)}</span
-          ><span>${formatDuration(card.duration)}</span>
+          <div class="seq">${state.dynamicsSeq}</div>
+          <div class="content">
+            <div class="title">
+              <a href="https://www.bilibili.com/video/${desc.bvid} target="_blank">${card.title}</a>
+            </div>
+            <div class="description">
+            </div>
+            <div class="meta">
+              <a class="with-sep" href="https://space.bilibili.com/${desc.user_profile?.info.uid}" target="_blank">${desc.user_profile?.info.uname}</a
+              ><span class="with-sep">${formatDate(card.pubdate)}</span
+              ><span>${formatDuration(card.duration)}</span>
+            </div>
+          </div>
         `
       } else {
         const card = _card as BangumiCard
         console.log('bangumi card', card, item)
         innerHtml = `
-          <span class="seq">${state.dynamicsSeq}</span
-          ><a class="with-sep title" href="${card.url}" target="_blank">${card.new_desc}</a
-          ><span class="with-sep">${card.apiSeasonInfo.title}</span
-          ><span class="with-sep">${formatDate(desc.timestamp)}</span>
+          <div class="seq">${state.dynamicsSeq}</div>
+          <div class="content">
+            <div class="title">
+              <a href="${card.url}" target="_blank">${card.new_desc}</a>
+            </div>
+            <div class="meta">
+              <span class="with-sep">${card.apiSeasonInfo.title}</span
+              ><span>${formatDate(desc.timestamp)}</span>
+            </div>
+          </div>
         `
       }
 
