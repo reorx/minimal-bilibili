@@ -1,0 +1,23 @@
+{
+  "extends": "./tsconfig.settings.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+    },
+    "declarationDir": "dist/types",
+    "allowJs": true,
+    "sourceMap": false,
+    // "noEmit": true,
+    // "noEmitOnError": true,
+    "experimentalDecorators": true,
+    "useDefineForClassFields": true,
+  },
+  "include": [
+    "./src"
+  ],
+  "exclude": [
+	  "**/__tests__",
+  ]
+}

@@ -1,0 +1,73 @@
+:root {
+  --search-container-width: 500px;
+}
+
+@media screen and (max-width: 500px) {
+  :root {
+    --search-container-width: 460px;
+  }
+}
+
+
+html body {
+  background-color: #fff;
+}
+
+body {
+  .center-search-container {
+    position: fixed;
+    left: 50%;
+    top: 180px;
+    width: var(--search-container-width);
+    margin-left: calc(0px - (var(--search-container-width) / 2));
+  }
+  .bili-header .slide-down .center-search-container {
+    top: 10px;
+    margin-left: calc(0px - (var(--search-container-width) / 2));
+  }
+
+  .header-channel {
+    display: none;
+  }
+
+  .bili-header {
+    .bili-header__channel {
+      display: none;
+    }
+  }
+
+  .bili-feed4-layout {
+    display: none;
+  }
+
+  .palette-button-outer {
+    display: none;
+  }
+
+  .trending {
+    display: none;
+  }
+}
+
+
+/* dynamics content styles */
+
+.dynamics-container {
+  width: 80%;
+  margin: 0 auto;
+  margin-top: 80px;
+
+  .dynamic-item {
+    margin-bottom: 8px;
+
+    a:hover {
+      color: var(--brand_blue);
+    }
+    .seq {
+      display: inline-block;
+      width: 20px;
+      text-align: right;
+      margin-right: 5px;
+    }
+  }
+}
