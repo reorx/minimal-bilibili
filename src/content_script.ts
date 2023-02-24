@@ -1,5 +1,6 @@
 import $, { Cash } from 'cash-dom';
 
+import { loadSettings } from './settings';
 import { colors, getLogger } from './utils/log';
 import { formatDate, formatDuration, hoursOrMinutesFrom } from './utils/misc';
 
@@ -8,8 +9,8 @@ import { formatDate, formatDuration, hoursOrMinutesFrom } from './utils/misc';
 possible settings:
 - [ ] enable/disable different columns
 - [ ] enable/disable scroll to load
-- [ ] enable/disable auto focus search bar
-- [ ] font size
+- [x] enable/disable auto focus search bar
+- [ ] feed font size
 
 TODO:
 - [ ] hover seq number to show preview
@@ -20,19 +21,61 @@ TODO:
 const lg = getLogger('content_script', colors.bgYellowBright)
 lg.info('content_script.ts');
 
-setTimeout(() => {
-  const searchInput = document.querySelector('input.nav-search-input') as HTMLInputElement
-  searchInput.focus()
-}, 1000);
-
-// remove download button
-const downloadLink = document.querySelector('.download-client-trigger')
-downloadLink?.parentElement?.remove()
-
 const TYPE_LIST = {
   VIDEO: '8',
   BANGUMI: '512,4097,4098,4099,4100,4101',
 }
+
+/* main */
+
+loadSettings().then((settings) => {
+  if (settings.autoFocusSearchBar) {
+    setTimeout(() => {
+      const searchInput = document.querySelector('input.nav-search-input') as HTMLInputElement
+      searchInput.focus()
+    }, 1000);
+  }
+
+  // remove download button
+  const downloadLink = document.querySelector('.download-client-trigger')
+  downloadLink?.parentElement?.remove()
+
+  // all the logics that rely on uid
+  const uidInterval = setInterval(() => {
+    // keep trying to get profile link
+    const profileLink = document.querySelector('.header-entry-mini') as HTMLLinkElement
+    if (!profileLink) {
+      return
+    }
+
+    clearInterval(uidInterval)
+
+    // get uid
+    const uidRegex = /space\.bilibili\.com\/(\d+)/
+    const uid = profileLink.href.match(uidRegex)![1]
+    // console.log('uid', uid)
+
+    // create container
+    const dynamicsParent = $('.bili-feed4')
+    const container = $('<div class="dynamics-container">').appendTo(dynamicsParent)
+
+    // init columns
+    const loadMoreFuncs: Array<() => Promise<void>> = []
+    loadMoreFuncs.push(
+      initDynamicsColumn(container, 'left', '视频', uid, TYPE_LIST.VIDEO)
+    )
+    loadMoreFuncs.push(
+      initDynamicsColumn(container, 'right', '番剧', uid, TYPE_LIST.BANGUMI)
+    )
+
+    // load more when scroll to bottom
+    detectScrollToBottom(async () => {
+      await Promise.all(loadMoreFuncs.map(f => f()))
+    })
+  }, 100)
+})
+
+/* functions */
 
 async function fetchDynamics(uid: string, dynamicId: string|null, type_list: string): Promise<DynamicData> {
   // see https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/dynamic/get_dynamic_detail.md
@@ -112,39 +155,6 @@ interface BangumiCard {
 }
 
 
-const uidInterval = setInterval(() => {
-  // keep trying to get profile link
-  const profileLink = document.querySelector('.header-entry-mini') as HTMLLinkElement
-  if (!profileLink) {
-    return
-  }
-
-  clearInterval(uidInterval)
-
-  // get uid
-  const uidRegex = /space\.bilibili\.com\/(\d+)/
-  const uid = profileLink.href.match(uidRegex)![1]
-  console.log('uid', uid)
-
-  // create container
-  const dynamicsParent = $('.bili-feed4')
-  const container = $('<div class="dynamics-container">').appendTo(dynamicsParent)
-
-  // init columns
-  const loadMoreFuncs: Array<() => Promise<void>> = []
-  loadMoreFuncs.push(
-    initDynamicsColumn(container, 'left', '视频', uid, TYPE_LIST.VIDEO)
-  )
-  loadMoreFuncs.push(
-    initDynamicsColumn(container, 'right', '番剧', uid, TYPE_LIST.BANGUMI)
-  )
-
-  // load more when scroll to bottom
-  detectScrollToBottom(async () => {
-    await Promise.all(loadMoreFuncs.map(f => f()))
-  })
-}, 100)
-
 
 interface ColumnState {
   dynamicsSeq: number
@@ -211,7 +221,7 @@ async function loadDynamics(state: ColumnState, container: Cash, uid: string, ty
         dateStr = formatDate(card.pubdate)
       } else {
         const card = _card as BangumiCard
-        console.log('bangumi card', card, item)
+        // console.log('bangumi card', card, item)
         innerHtml = `
           <div class="seq">${state.dynamicsSeq}</div>
           <div class="content">
