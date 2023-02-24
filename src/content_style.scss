@@ -80,6 +80,29 @@ body {
     }
   }
 
+  .date-separator {
+    text-align: center;
+    color: #aaa;
+    margin: 15px 0;
+    display: flex;
+    &:before,
+    &:after {
+      content: "";
+      display: block;
+      height: 1px;
+      background-color: #ccc;
+      margin-top: 12px;
+    }
+    &:before {
+      width: 25px;
+      margin-right: 10px;
+    }
+    &:after {
+      flex-grow: 1;
+      margin-left: 10px;
+    }
+  }
+
   .dynamic-item {
     margin-bottom: 10px;
     color: #aaa;

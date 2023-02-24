@@ -1,7 +1,7 @@
 import $, { Cash } from 'cash-dom';
 
 import { colors, getLogger } from './utils/log';
-import { formatDate, formatDuration } from './utils/misc';
+import { formatDate, formatDuration, hoursOrMinutesFrom } from './utils/misc';
 
 
 /*
@@ -174,12 +174,13 @@ function initDynamicsColumn(container: Cash, name: string, title: string, uid: s
 async function loadDynamics(state: ColumnState, container: Cash, uid: string, type_list: string) {
 
   return fetchDynamics(uid, state.lastDynamicId, type_list).then(data => {
-    console.log('data', data)
+    // console.log('data', data)
     for (const item of data.data.cards) {
       state.dynamicsSeq++
       const desc = item.desc
       const _card = JSON.parse(item.card)
       let innerHtml
+      let dateStr
       if (desc.bvid) {
         const card = _card as VideoCard
         innerHtml = `
@@ -192,7 +193,7 @@ async function loadDynamics(state: ColumnState, container: Cash, uid: string, ty
             </div>
             <div class="meta">
               <span class="with-sep">${spanIcon('user')}<a href="https://space.bilibili.com/${desc.user_profile?.info.uid}" target="_blank">${desc.user_profile?.info.uname}</a></span
-              ><span class="with-sep">${spanIcon('calendar-time')}${formatDate(card.pubdate)}</span
+              ><span class="with-sep">${spanIcon('calendar-time')}${hoursOrMinutesFrom(card.pubdate)}</span
               ><span class="with-sep">${spanIcon('clock')}${formatDuration(card.duration)}</span
               ><span class="stats">
                 ${spanIcon('thumb-up')}<span class="value">${card.stat.like}</span>
@@ -202,6 +203,7 @@ async function loadDynamics(state: ColumnState, container: Cash, uid: string, ty
             </div>
           </div>
         `
+        dateStr = formatDate(card.pubdate)
       } else {
         const card = _card as BangumiCard
         console.log('bangumi card', card, item)
@@ -213,10 +215,17 @@ async function loadDynamics(state: ColumnState, container: Cash, uid: string, ty
             </div>
             <div class="meta">
               <span class="with-sep">${spanIcon('user')}${card.apiSeasonInfo.title}</span
-              ><span>${spanIcon('calendar-time')}${formatDate(desc.timestamp)}</span
+              ><span>${spanIcon('calendar-time')}${hoursOrMinutesFrom(desc.timestamp)}</span
             </div>
           </div>
         `
+        dateStr = formatDate(desc.timestamp)
+      }
+
+      // get or create date separator
+      const dateSeparator = container.find(`.date-separator[data-date="${dateStr}"]`)
+      if (dateSeparator.length === 0) {
+        $(`<div class="date-separator" data-date="${dateStr}"><span>${dateStr}</span></div>`).appendTo(container)
       }
 
       const dynamicItem = $('<div class="dynamic-item">').appendTo(container)
