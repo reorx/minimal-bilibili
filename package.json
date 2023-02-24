@@ -13,6 +13,7 @@
   "author": "Reorx <novoreorx@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "@iconify-json/tabler": "^1.1.62",
     "cash-dom": "^8.1.3",
     "chalk": "^5.0.1",
     "delegate-it": "^3.0.0",
@@ -23,6 +24,8 @@
     "@babel/core": "^7.17.12",
     "@babel/preset-env": "^7.17.12",
     "@babel/preset-typescript": "^7.17.12",
+    "@iconify/json": "^2.2.27",
+    "@iconify/utils": "^2.1.4",
     "@reorx/webpack-ext-reloader": "^1.1.11",
     "@types/chrome": "0.0.217",
     "@typescript-eslint/eslint-plugin": "^5.24.0",

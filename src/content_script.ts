@@ -164,14 +164,19 @@ async function loadDynamics(state: ColumnState, container: Cash, uid: string, ty
           <div class="seq">${state.dynamicsSeq}</div>
           <div class="content">
             <div class="title">
-              <a href="https://www.bilibili.com/video/${desc.bvid} target="_blank">${card.title}</a>
+              <a href="https://www.bilibili.com/video/${desc.bvid}" target="_blank">${card.title}</a>
             </div>
             <div class="description">
             </div>
             <div class="meta">
-              <a class="with-sep" href="https://space.bilibili.com/${desc.user_profile?.info.uid}" target="_blank">${desc.user_profile?.info.uname}</a
-              ><span class="with-sep">${formatDate(card.pubdate)}</span
-              ><span>${formatDuration(card.duration)}</span>
+              <span class="with-sep">${spanIcon('user')}<a href="https://space.bilibili.com/${desc.user_profile?.info.uid}" target="_blank">${desc.user_profile?.info.uname}</a></span
+              ><span class="with-sep">${spanIcon('calendar-time')}${formatDate(card.pubdate)}</span
+              ><span class="with-sep">${spanIcon('clock')}${formatDuration(card.duration)}</span
+              ><span class="stats">
+                ${spanIcon('thumb-up')}<span class="value">${card.stat.like}</span>
+                ${spanIcon('coin-yuan')}<span class="value">${card.stat.coin}</span>
+                ${spanIcon('star')}<span class="value">${card.stat.favorite}</span>
+              </span>
             </div>
           </div>
         `
@@ -185,8 +190,8 @@ async function loadDynamics(state: ColumnState, container: Cash, uid: string, ty
               <a href="${card.url}" target="_blank">${card.new_desc}</a>
             </div>
             <div class="meta">
-              <span class="with-sep">${card.apiSeasonInfo.title}</span
-              ><span>${formatDate(desc.timestamp)}</span>
+              <span class="with-sep">${spanIcon('user')}${card.apiSeasonInfo.title}</span
+              ><span>${spanIcon('calendar-time')}${formatDate(desc.timestamp)}</span
             </div>
           </div>
         `
@@ -198,4 +203,8 @@ async function loadDynamics(state: ColumnState, container: Cash, uid: string, ty
       state.lastDynamicId = desc.dynamic_id_str
     }
   })
+}
+
+function spanIcon(icon: string) {
+  return `<span class="icon icon--tabler icon--tabler--${icon}"></span>`
 }

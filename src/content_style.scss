@@ -1,3 +1,5 @@
+@import "./icons";
+
 :root {
   --search-container-width: 500px;
 }
@@ -56,7 +58,7 @@ body {
   width: 86vw;
   margin: 0 auto;
   margin-top: 80px;
-  font-size: 15px;
+  font-size: 16px;
   padding-bottom: 50px;
 
   display: grid;
@@ -84,9 +86,11 @@ body {
     display: flex;
 
     .seq {
-      width: 20px;
+      width: 25px;
       text-align: right;
+      padding-right: 5px;
       margin-right: 10px;
+      font-size: 14px;
     }
     .title {
       color: #333;
@@ -99,15 +103,17 @@ body {
     }
     .meta {
       font-size: 14px;
+      position: relative;
+
+      .value {
+        margin-right: 3px;
+      }
     }
 
     // styles
     &:hover {
-      .title a {
-        border-bottom: 1px solid #aaa;
-      }
-      .title a:hover {
-        border-color: var(--brand_blue);
+      .seq {
+        background-color: #eee;
       }
     }
     a:hover {
@@ -117,6 +123,11 @@ body {
       content: "•";
       display: inline-block;
       margin: 0 10px;
+    }
+    .icon {
+      position: relative;
+      top: 2px;
+      margin-right: 2px;
     }
   }
 
