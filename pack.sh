@@ -1,6 +1,7 @@
 #!/bin/bash
 
-: ${outdir:="$HOME/Downloads"}
+dist_dir="$PWD/dist"
+build_dir="$PWD/build"
 package_name="minimal-bilibili"
 manifest_path="public/manifest.json"
 
@@ -11,10 +12,11 @@ if [ -z "$version" ]; then
 fi
 filename="${package_name}-$version.zip"
 
-pushd dist
+pushd "$build_dir"
 zip $filename * -vr -x 'types*'
-mv $filename $outdir
+mkdir -p "$dist_dir"
+mv $filename "$dist_dir"
 popd
 
 echo "Result:"
-ls -l $outdir/$filename
+ls -l "$dist_dir/$filename"

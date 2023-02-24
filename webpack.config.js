@@ -7,7 +7,7 @@ const { merge } = require('webpack-merge')
 
 const rootDir = path.resolve(__dirname)
 const srcDir = path.join(rootDir, 'src')
-const destDir = path.join(rootDir, 'dist')
+const destDir = path.join(rootDir, 'build')
 
 console.log('srcDir', srcDir)
 

@@ -6,7 +6,7 @@
     "paths": {
       "@/*": ["src/*"],
     },
-    "declarationDir": "dist/types",
+    // "declarationDir": "build/types",
     "allowJs": true,
     "sourceMap": false,
     // "noEmit": true,
