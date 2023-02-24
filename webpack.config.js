@@ -14,11 +14,9 @@ console.log('srcDir', srcDir)
 const common = {
   entry: {
     background: path.join(srcDir, 'background.ts'),
-    popup: path.join(srcDir, 'popup.ts'),
     options: path.join(srcDir, 'options.ts'),
     content_script: path.join(srcDir, 'content_script.ts'),
     content_style: path.join(srcDir, 'content_style.scss'),
-    inject: path.join(srcDir, 'inject.ts'),
   },
   output: {
     path: destDir,
@@ -30,9 +28,6 @@ const common = {
         test: /\.tsx?$/,
         loader: 'ts-loader',
         exclude: /node_modules/,
-        // options: {
-        //   projectReferences: true,
-        // }
       },
       {
         test: /\.css$/i,

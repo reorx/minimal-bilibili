@@ -8,9 +8,6 @@
     "48": "icon.png",
     "128": "icon.png"
   },
-  "action": {
-    "default_popup": "popup.html"
-  },
   "options_ui": {
     "page": "options.html"
   },
@@ -24,16 +21,8 @@
       "js": ["js/content_script.js"]
     }
   ],
-  "web_accessible_resources": [
-    {
-      "resources": ["/js/inject.js"],
-      "matches": ["https://www.bilibili.com/*"]
-    }
-  ],
   "permissions": [
     "storage",
-    "tabs",
-    "scripting",
-    "activeTab"
+    "tabs"
   ]
 }
