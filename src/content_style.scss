@@ -228,10 +228,19 @@ body {
   position: fixed;
   width: 80vw;
   left: calc(50% - 40vw);
-  top: 8vh;
+  top: 10vh;
   padding: 0;
   border: 0;
   background-color: transparent;
+
+  // macbook pro 13 screen size: 1440x900
+  @media screen and (max-height: 900px) {
+    top: 20px;
+  }
+
+  &::backdrop {
+    background: rgba(100, 100, 100, 0.7);
+  }
 
   #minimal-bilibili-player {
     line-height: 0;
@@ -241,6 +250,7 @@ body {
       max-height: 70vh;
       // dialog default border;
       border: 3px solid #000;
+      background-color: #000;
     }
   }
 
@@ -249,18 +259,24 @@ body {
     margin-top: 20px;
     background-color: #fff;
     padding: 10px;
+    margin-bottom: 20px;
     display: flex;
     gap: 15px;
 
     .video-info {
-      font-size: 15px;
+      font-size: 14px;
       flex-grow: 1;
+      .content {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
 
       a:hover {
         color: var(--brand_blue);
       }
       .title {
-        font-size: 20px;
+        font-size: 18px;
       }
       .meta {
         position: relative;
@@ -287,14 +303,17 @@ body {
         display: block;
         word-wrap: break-word;
         white-space: pre-wrap;
+        max-height: 90px;
+        overflow-y: auto;
       }
     }
 
     .player-controls {
       display: flex;
       flex-direction: column;
-      gap: 15px;
+      gap: 10px;
       min-width: 170px;
+      padding-top: 5px;
 
       .item {
         display: flex;
@@ -307,19 +326,7 @@ body {
         input[type=range] {
           width: 120px;
         }
-        form {
-          display: flex;
-        }
-
-        .close-button {
-          display: flex;
-          align-items: center;
-          .icon {
-            font-size: 20px;
-          }
-        }
       }
-
     }
   }
   .top-right {

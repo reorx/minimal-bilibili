@@ -17,8 +17,9 @@ possible settings:
 - [ ] feed font size
 
 TODO:
-- [ ] hover seq number to show preview
+- [x] hover seq number to show preview
 - [ ] column for recommendations
+- [ ] like, tip, fav buttons
 */
 
 
@@ -92,11 +93,6 @@ loadSettings().then((settings) => {
           <div class="item quality-switcher">
             <label for="v-player-quality">画质</label>
             <select id="v-player-quality"></select>
-          </div>
-          <div class="item">
-            <form method="dialog">
-              <button class="close-button button"><span class="text">关闭视频</span>${spanIcon('x')}</button>
-            </form>
           </div>
         </div>
       </div>
