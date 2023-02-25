@@ -24,8 +24,9 @@ body {
     margin-left: calc(0px - (var(--search-container-width) / 2));
   }
   .bili-header .slide-down .center-search-container {
-    top: 10px;
-    margin-left: calc(0px - (var(--search-container-width) / 2));
+    margin-left: 0;
+    width: auto;
+    position: static;
   }
 
   .header-channel {
