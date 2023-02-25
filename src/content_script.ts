@@ -100,6 +100,9 @@ loadSettings().then((settings) => {
           </div>
         </div>
       </div>
+      <form method="dialog" class="top-right">
+        <button class="close-button">${spanIcon('x')}</button>
+      </form>
     `
     document.body.appendChild(playerDialog)
 
@@ -123,7 +126,10 @@ loadSettings().then((settings) => {
 
     // listen to video link click
     delegate(container.get(0) as HTMLDivElement, '.dynamic-item .title a', 'click', async (e) => {
-      e.preventDefault()
+      e.preventDefault();
+      // mark visited
+      (e.target as HTMLLinkElement).classList.add('visited');
+
       playerDialog.showModal()
       if (state.currentPlayer) {
         state.currentPlayer.destroy()

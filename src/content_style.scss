@@ -180,6 +180,7 @@ body {
         padding-bottom: 1px;
       }
       // background-color, child selector, sibling selector are not allowed in pseudo element
+      a.visited,
       a:visited {
         color: #AC6DFF;
         // purple: #C392FF, #AC6DFF, #8F56E4, #723ECC, #5627B3
@@ -228,7 +229,7 @@ body {
   width: 80vw;
   left: calc(50% - 40vw);
   top: 8vh;
-  padding: 20px 0;
+  padding: 0;
   border: 0;
   background-color: transparent;
 
@@ -319,6 +320,22 @@ body {
         }
       }
 
+    }
+  }
+  .top-right {
+    position: absolute;
+    top: 0; right: 0;
+    width: 100px;
+    height: 100px;
+    text-align: right;
+    padding: 15px;
+    .close-button {
+      font-size: 50px;
+      color: transparent;
+      transition: color 0.3s ease;
+    }
+    &:hover .close-button {
+      color: #fff;
     }
   }
 }
