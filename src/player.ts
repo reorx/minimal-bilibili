@@ -28,6 +28,8 @@ export class Player {
   elAudio: HTMLAudioElement
   syncInterval: NodeJS.Timer
   preference: PlayerPreference
+  usedVideoBackupUrls: {[key: string]: boolean} = {}
+  usedAudioBackupUrls: {[key: string]: boolean} = {}
 
   constructor(playInfo: PlayInfo) {
     this.playInfo = playInfo
@@ -38,6 +40,7 @@ export class Player {
     this.preference = this.loadPreference()
 
     const elVideo = createVideo(video.baseUrl, video.mimeType, 640)
+    this.usedAudioBackupUrls[audio.baseUrl] = true
     const elAudio = createAudio(audio.baseUrl, 'audio/mp4')
 
     this.el.appendChild(elVideo)
@@ -69,6 +72,47 @@ export class Player {
     this.syncInterval = setInterval(() => {
       syncTime()
     }, 2000)
+
+    // error handling
+    const onVideoError = (e: any) => {
+      console.warn('video error, try switching to backup url', e)
+      let backupUrl = ''
+      for (const video of this.playInfo.mediaInfo.videos) {
+        for (const url of video.backupUrl) {
+          if (!this.usedVideoBackupUrls[url]) {
+            backupUrl = url
+            break
+          }
+        }
+      }
+      if (!backupUrl) {
+        console.error('no backup url for video available')
+        return
+      }
+      console.log(`try reload video with backup url: ${backupUrl}`)
+      this.usedVideoBackupUrls[backupUrl] = true
+      this.reloadVideo(backupUrl, elVideo.currentTime)
+    }
+    elVideo.addEventListener('error', onVideoError)
+
+    const onAudioError = (e: any) => {
+      console.warn('audio error, try switching to other url', e)
+      let backupUrl = ''
+      for (const audio of this.playInfo.mediaInfo.audios) {
+        if (!this.usedAudioBackupUrls[audio.baseUrl]) {
+          backupUrl = audio.baseUrl
+          break
+        }
+      }
+      if (!backupUrl) {
+        console.error('no backup url for audio available')
+        return
+      }
+      console.log(`try reload audio with backup url: ${backupUrl}`)
+      this.usedAudioBackupUrls[backupUrl] = true
+      this.reloadAudio(backupUrl)
+    }
+    elAudio.addEventListener('error', onAudioError)
 
     elVideo.play()
 
@@ -105,6 +149,7 @@ export class Player {
 
   initQualitySwitcher($el: Cash) {
     const select = $el.get(0) as HTMLSelectElement
+    $el.empty()
 
     const availableQualitiesMap: {[key: string]: boolean} = {}
     this.playInfo.mediaInfo.videos.forEach(v => {
@@ -128,9 +173,14 @@ export class Player {
     const {video} = selectMedias(this.playInfo, quality)
     const {elVideo} = this
     const time = elVideo.currentTime
+    this.reloadVideo(video.baseUrl, time)
+  }
+
+  reloadVideo(url: string, time: number) {
+    const {elVideo} = this
     elVideo.pause()
     const source = this.elVideo.children[0] as HTMLSourceElement
-    source.src = video.baseUrl
+    source.src = url
 
     const onLoad = () => {
       elVideo.removeEventListener('loadedmetadata', onLoad)
@@ -140,6 +190,15 @@ export class Player {
     elVideo.addEventListener('loadedmetadata', onLoad)
     elVideo.load()
   }
+
+  reloadAudio(url: string) {
+    const {elAudio} = this
+    const source = this.elAudio.children[0] as HTMLSourceElement
+    source.src = url
+    elAudio.load()
+    elAudio.play()
+  }
+
 
   destroy() {
     clearInterval(this.syncInterval)

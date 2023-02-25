@@ -110,6 +110,7 @@ loadSettings().then((settings) => {
         state.currentPlayer.elAudio.volume = parseInt(volume) / 100
     })
     delegate(playerDialog, '#v-player-quality', 'change', (e) => {
+      console.log('change quality', (e.target as HTMLSelectElement).value)
       if (state.currentPlayer)
         state.currentPlayer.switchQuality(parseInt((e.target as HTMLSelectElement).value))
     })
