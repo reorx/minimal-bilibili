@@ -125,7 +125,7 @@ loadSettings().then((settings) => {
     })
 
     // listen to video link click
-    delegate(container.get(0) as HTMLDivElement, '.dynamic-item .title a', 'click', async (e) => {
+    delegate(container.get(0) as HTMLDivElement, '.left-column .dynamic-item .title a', 'click', async (e) => {
       e.preventDefault();
       // mark visited
       (e.target as HTMLLinkElement).classList.add('visited');
