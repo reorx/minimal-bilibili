@@ -70,7 +70,10 @@ export const parseBV = async (html: string, url: string) => {
 
 export function selectMedias(playInfo: PlayInfo, quality?: number) {
   const { videos, audios } = playInfo.mediaInfo
-  const video = videos[0]
+  let video = videos[0]
+  if (quality) {
+    video = videos.find(v => v.id === quality) || video
+  }
   const audio = audios[0]
   return {
     video,

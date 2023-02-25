@@ -1,4 +1,6 @@
-import { AudioInfo, VideoInfo } from './bilibili';
+import { Cash } from 'cash-dom';
+
+import { AudioInfo, PlayInfo, selectMedias, VideoInfo } from './bilibili';
 
 
 /*
@@ -7,64 +9,146 @@ Docs:
 - https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/seeked_event
 */
 
-export interface Player {
-  el: HTMLDivElement
-  destroy: () => void
+export interface PlayerPreference {
+  volume: number
 }
 
-export function createPlayer(video: VideoInfo, audio: AudioInfo) {
-  const el = document.createElement('div')
-  el.id = "minimal-bilibili-player"
+const defaultPreference = {
+  volume: 80
+}
 
-  const elVideo = createVideo(video.baseUrl, video.mimeType, 640)
-  const elAudio = createAudio(audio.baseUrl, 'audio/mp4')
+const storageKeyPreference = 'minimal-bilibili-player-preference'
 
-  el.appendChild(elVideo)
-  el.appendChild(elAudio)
+export class Player {
+  el: HTMLDivElement
+  playInfo: PlayInfo
+  video: VideoInfo
+  audio: AudioInfo
+  elVideo: HTMLVideoElement
+  elAudio: HTMLAudioElement
+  syncInterval: NodeJS.Timer
+  preference: PlayerPreference
 
-  elVideo.addEventListener('play', () => {
-    elAudio.play()
-    console.log('play')
-  })
-  elVideo.addEventListener('pause', () => {
-    elAudio.pause()
-    console.log('pause')
-  })
-  elVideo.addEventListener('ratechange', () => {
-    elAudio.playbackRate = elVideo.playbackRate
-  })
+  constructor(playInfo: PlayInfo) {
+    this.playInfo = playInfo
+    const {video, audio} = selectMedias(playInfo)
 
-  // https://stackoverflow.com/questions/66683613/how-to-combine-video-source-with-audio
-  const syncTime = () => {
-    if (elAudio.currentTime !== elVideo.currentTime)
-      elAudio.currentTime = elVideo.currentTime;
+    this.el = document.createElement('div')
+    this.el.id = "minimal-bilibili-player"
+    this.preference = this.loadPreference()
+
+    const elVideo = createVideo(video.baseUrl, video.mimeType, 640)
+    const elAudio = createAudio(audio.baseUrl, 'audio/mp4')
+
+    this.el.appendChild(elVideo)
+    this.el.appendChild(elAudio)
+
+    elVideo.addEventListener('play', () => {
+      elAudio.play()
+      console.log('play')
+    })
+    elVideo.addEventListener('pause', () => {
+      elAudio.pause()
+      console.log('pause')
+    })
+    elVideo.addEventListener('ratechange', () => {
+      elAudio.playbackRate = elVideo.playbackRate
+    })
+
+    // https://stackoverflow.com/questions/66683613/how-to-combine-video-source-with-audio
+    const syncTime = () => {
+      if (elAudio.currentTime !== elVideo.currentTime)
+        elAudio.currentTime = elVideo.currentTime;
+    }
+
+    elVideo.addEventListener('seeked', () => {
+      console.log('seeked')
+      syncTime()
+    })
+
+    this.syncInterval = setInterval(() => {
+      syncTime()
+    }, 2000)
+
+    elVideo.play()
+
+    this.elVideo = elVideo
+    this.elAudio = elAudio
+    this.video = video
+    this.audio = audio
   }
 
-  elVideo.addEventListener('seeked', () => {
-    console.log('seeked')
-    syncTime()
-  })
+  loadPreference() {
+    const _pref = localStorage.getItem(storageKeyPreference)
+    if (_pref) {
+      return JSON.parse(_pref) as PlayerPreference
+    }
+    return {...defaultPreference}
+  }
 
-  const syncInterval = setInterval(() => {
-    syncTime()
-  }, 2000)
+  savePreference() {
+    localStorage.setItem(storageKeyPreference, JSON.stringify(this.preference))
+  }
 
-  elVideo.play()
+  setVolume(volume: number) {
+    this.preference.volume = volume
+    this.elAudio.volume = volume / 100
+  }
 
-  const player: Player = {
-    el,
-    destroy: () => {
-      clearInterval(syncInterval)
-      elVideo.remove()
-      elAudio.remove()
-      el.remove()
+  initVolumeSlider($el: Cash) {
+    const input = $el.get(0) as HTMLInputElement
+    input.min = '0'
+    input.max = '100'
+    input.step = '1'
+    input.value = this.preference.volume.toString()
+  }
+
+  initQualitySwitcher($el: Cash) {
+    const select = $el.get(0) as HTMLSelectElement
+
+    const availableQualitiesMap: {[key: string]: boolean} = {}
+    this.playInfo.mediaInfo.videos.forEach(v => {
+      availableQualitiesMap[v.id] = true
+    })
+
+    for (const opt of this.playInfo.qualityOptions) {
+      // ignore unavailable quality
+      if (!availableQualitiesMap[opt.value]) continue
+
+      const el = document.createElement('option')
+      el.value = opt.value.toString()
+      el.innerText = opt.label
+      if (opt.value === this.video.id)
+        el.selected = true
+      select.appendChild(el)
     }
   }
-  return player
 
-  // const player = new Plyr(el)
-  // player.play()
+  switchQuality(quality: number) {
+    const {video} = selectMedias(this.playInfo, quality)
+    const {elVideo} = this
+    const time = elVideo.currentTime
+    elVideo.pause()
+    const source = this.elVideo.children[0] as HTMLSourceElement
+    source.src = video.baseUrl
+
+    const onLoad = () => {
+      elVideo.removeEventListener('loadedmetadata', onLoad)
+      elVideo.currentTime = time
+      elVideo.play()
+    }
+    elVideo.addEventListener('loadedmetadata', onLoad)
+    elVideo.load()
+  }
+
+  destroy() {
+    clearInterval(this.syncInterval)
+    this.elVideo.remove()
+    this.elAudio.remove()
+    this.el.remove()
+  }
 }
+
 
 function createVideo(src: string, type: string, width: number) {
   const video = document.createElement('video')

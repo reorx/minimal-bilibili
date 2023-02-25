@@ -249,10 +249,11 @@ body {
     background-color: #fff;
     padding: 10px;
     display: flex;
+    gap: 15px;
 
     .video-info {
-      flex-grow: 1;
       font-size: 15px;
+      flex-grow: 1;
 
       a:hover {
         color: var(--brand_blue);
@@ -283,6 +284,8 @@ body {
       }
       .desc {
         display: block;
+        word-wrap: break-word;
+        white-space: pre-wrap;
       }
     }
 
@@ -290,7 +293,7 @@ body {
       display: flex;
       flex-direction: column;
       gap: 15px;
-      width: 170px;
+      min-width: 170px;
 
       .item {
         display: flex;
@@ -298,13 +301,13 @@ body {
 
         label {
           margin-right: 10px;
+          width: 30px;
         }
         input[type=range] {
           width: 120px;
         }
         form {
           display: flex;
-          flex-direction: row-reverse;
         }
 
         .close-button {

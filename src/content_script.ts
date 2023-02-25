@@ -1,8 +1,8 @@
 import $, { Cash } from 'cash-dom';
 import delegate from 'delegate-it';
 
-import { parseBV, selectMedias } from './bilibili';
-import { createPlayer, Player } from './player';
+import { parseBV } from './bilibili';
+import { Player } from './player';
 import { loadSettings } from './settings';
 import { colors, getLogger } from './utils/log';
 import { formatDate, formatDuration, hoursOrMinutesFrom } from './utils/misc';
@@ -87,13 +87,11 @@ loadSettings().then((settings) => {
         <div class="player-controls">
           <div class="item volume-slider">
             <label for="v-player-volume">音量</label>
-            <input type="range" min="0" max="100" step="1" id="v-player-volume">
+            <input type="range" id="v-player-volume">
           </div>
           <div class="item quality-switcher">
-            <label for="v-player-volume">画质</label>
-            <select id="v-player-quality">
-              <option value="1080p">1080p</option>
-            </select>
+            <label for="v-player-quality">画质</label>
+            <select id="v-player-quality"></select>
           </div>
           <div class="item">
             <form method="dialog">
@@ -104,6 +102,17 @@ loadSettings().then((settings) => {
       </div>
     `
     document.body.appendChild(playerDialog)
+
+    // player controls
+    delegate(playerDialog, '#v-player-volume', 'input', (e) => {
+      const volume = (e.target as HTMLInputElement).value
+      if (state.currentPlayer)
+        state.currentPlayer.elAudio.volume = parseInt(volume) / 100
+    })
+    delegate(playerDialog, '#v-player-quality', 'change', (e) => {
+      if (state.currentPlayer)
+        state.currentPlayer.switchQuality(parseInt((e.target as HTMLSelectElement).value))
+    })
 
     playerDialog.addEventListener('close', () => {
       if (state.currentPlayer) {
@@ -125,16 +134,22 @@ loadSettings().then((settings) => {
       const playInfo = await parseBV(html, url)
       const $playerContainer = $('.player-container')
 
-      // select video and audio
-      const {video, audio} = selectMedias(playInfo)
-      state.currentPlayer = createPlayer(video, audio)
-      $playerContainer.append(state.currentPlayer.el)
+      // create player
+      const player = new Player(playInfo)
+      $playerContainer.append(player.el)
+
+      // update player controls
+      player.initVolumeSlider($('#v-player-volume'))
+      player.initQualitySwitcher($('#v-player-quality'))
 
       // add video info
       const videoInfoContent = (e.target as HTMLLinkElement).parentElement!.parentElement!
       $('.player-panel .video-info').empty().append(
         $(videoInfoContent).clone()
       )
+
+      // update player to state
+      state.currentPlayer = player
     })
 
     // load more when scroll to bottom
