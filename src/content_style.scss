@@ -124,6 +124,12 @@ body {
         display: inline-block;
         padding-bottom: 1px;
       }
+      // background-color, child selector, sibling selector are not allowed in pseudo element
+      a:visited {
+        color: #AC6DFF;
+        // purple: #C392FF, #AC6DFF, #8F56E4, #723ECC, #5627B3
+        // yellow: #FFDB93, #FFC65D, #FFB027,
+      }
     }
     .meta {
       font-size: 14px;
