@@ -9,9 +9,19 @@ const store: {settings: Settings} = {
   settings: {...defaultSettings},
 }
 
-const $autoFocus = $('#input-auto-focus')
+const $autoFocus = $('#v-auto-focus')
 $autoFocus.on('change', () => {
   store.settings.autoFocusSearchBar = $autoFocus.prop('checked')
+})
+
+const $autoLoadVideoColumn = $('#v-auto-load-video-column')
+$autoLoadVideoColumn.on('change', () => {
+  store.settings.autoLoadVideoColumn = $autoLoadVideoColumn.prop('checked')
+})
+
+const $autoLoadBangumiColumn = $('#v-auto-load-bangumi-column')
+$autoLoadBangumiColumn.on('change', () => {
+  store.settings.autoLoadBangumiColumn = $autoLoadBangumiColumn.prop('checked')
 })
 
 $('#fn-save').on('click', () => {
@@ -26,4 +36,6 @@ loadSettings().then((settings) => {
 
   // load settings to UI
   $autoFocus.prop('checked', store.settings.autoFocusSearchBar)
+  $autoLoadVideoColumn.prop('checked', store.settings.autoLoadVideoColumn)
+  $autoLoadBangumiColumn.prop('checked', store.settings.autoLoadBangumiColumn)
 })

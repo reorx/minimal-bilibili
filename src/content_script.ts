@@ -70,12 +70,13 @@ loadSettings().then((settings) => {
 
     // init columns
     const loadMoreFuncs: Array<() => Promise<void>> = []
-    loadMoreFuncs.push(
-      initDynamicsColumn(container, 'left', '视频', uid, TYPE_LIST.VIDEO)
-    )
-    loadMoreFuncs.push(
-      initDynamicsColumn(container, 'right', '番剧', uid, TYPE_LIST.BANGUMI)
-    )
+
+    const loadMoreVideos = initDynamicsColumn(container, 'left', '视频', uid, TYPE_LIST.VIDEO)
+    if (settings.autoLoadVideoColumn)
+      loadMoreFuncs.push(loadMoreVideos)
+    const loadMoreBangumi = initDynamicsColumn(container, 'right', '番剧', uid, TYPE_LIST.BANGUMI)
+    if (settings.autoLoadBangumiColumn)
+      loadMoreFuncs.push(loadMoreBangumi)
 
     // create player dialog
     const playerDialog = document.createElement('dialog')
@@ -159,6 +160,7 @@ loadSettings().then((settings) => {
 
     // load more when scroll to bottom
     detectScrollToBottom(async () => {
+      if (loadMoreFuncs.length === 0) return
       await Promise.all(loadMoreFuncs.map(f => f()))
     })
   }, 100)
@@ -357,6 +359,8 @@ function divPreview(img: string, desc: string) {
   `
 }
 
+const scrollBottomOffset = 5;
+
 function detectScrollToBottom(callback: () => Promise<void>) {
   let isDoing = false;
 
@@ -366,7 +370,8 @@ function detectScrollToBottom(callback: () => Promise<void>) {
     const scrollPosition = window.scrollY;
     const windowSize = window.innerHeight;
     const fullSize = document.body.scrollHeight;
-    if (scrollPosition + windowSize >= fullSize) {
+    // console.log('scroll', isDoing, scrollPosition, scrollPosition + windowSize, fullSize)
+    if (scrollPosition + windowSize + scrollBottomOffset > fullSize) {
       isDoing = true
       await callback();
       isDoing = false
