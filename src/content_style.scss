@@ -52,6 +52,13 @@ body {
   }
 }
 
+.button {
+  padding: 8px 15px;
+  background: #f3f3f3;
+  &:hover {
+    background: #eee;
+  }
+}
 
 /* dynamics content styles */
 
@@ -102,6 +109,12 @@ body {
       flex-grow: 1;
       margin-left: 10px;
     }
+  }
+
+  .icon {
+    position: relative;
+    top: 2px;
+    margin-right: 2px;
   }
 
   .dynamic-item {
@@ -181,6 +194,9 @@ body {
         margin-right: 3px;
       }
     }
+    .desc {
+      display: none;
+    }
 
     // styles
     &:hover {
@@ -196,11 +212,6 @@ body {
       display: inline-block;
       margin: 0 10px;
     }
-    .icon {
-      position: relative;
-      top: 2px;
-      margin-right: 2px;
-    }
   }
 
   .actions {
@@ -208,26 +219,103 @@ body {
 
     .load-more {
       margin-left: 35px;
-      padding: 8px 15px;
-      background: #f3f3f3;
-      &:hover {
-        background: #eee;
-      }
     }
   }
 }
 
-body {
-  dialog {
-    width: 80vw;
-    margin: auto;
-    margin-top: 100px;
-    padding: 20px;
-  }
+.player-dialog {
+  position: fixed;
+  width: 80vw;
+  left: calc(50% - 40vw);
+  top: 8vh;
+  padding: 20px 0;
+  border: 0;
+  background-color: transparent;
 
-  .player-dialog {
+  #minimal-bilibili-player {
+    line-height: 0;
+
     video {
       width: 100%;
+      max-height: 70vh;
+      // dialog default border;
+      border: 3px solid #000;
+    }
+  }
+
+  .player-panel {
+    border: 3px solid #000;
+    margin-top: 20px;
+    background-color: #fff;
+    padding: 10px;
+    display: flex;
+
+    .video-info {
+      flex-grow: 1;
+      font-size: 15px;
+
+      a:hover {
+        color: var(--brand_blue);
+      }
+      .title {
+        font-size: 20px;
+      }
+      .meta {
+        position: relative;
+        color: #aaa;
+        margin-left: -2px;
+
+        .value {
+          margin-right: 3px;
+        }
+
+        .icon {
+          position: relative;
+          top: 2px;
+          margin-right: 2px;
+        }
+
+        .with-sep:after {
+          content: "•";
+          display: inline-block;
+          margin: 0 10px;
+        }
+      }
+      .desc {
+        display: block;
+      }
+    }
+
+    .player-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      width: 170px;
+
+      .item {
+        display: flex;
+        align-items: center;
+
+        label {
+          margin-right: 10px;
+        }
+        input[type=range] {
+          width: 120px;
+        }
+        form {
+          display: flex;
+          flex-direction: row-reverse;
+        }
+
+        .close-button {
+          display: flex;
+          align-items: center;
+          .icon {
+            font-size: 20px;
+          }
+        }
+      }
+
     }
   }
 }

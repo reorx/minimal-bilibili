@@ -80,17 +80,27 @@ loadSettings().then((settings) => {
     const playerDialog = document.createElement('dialog')
     playerDialog.classList.add('player-dialog')
     playerDialog.innerHTML = `
-      <form method="dialog">
-        <button class="close-button">X</button>
-      </form>
-      <div class="video-info">
-        <div class="title"></div>
-        <div class="author"></div>
-      </div>
       <div class="player-container"></div>
-      <div class="player-controls">
-        <div class="volume-slider"></div>
-        <div class="quality-switcher"></div>
+      <div class="player-panel">
+        <div class="video-info">
+        </div>
+        <div class="player-controls">
+          <div class="item volume-slider">
+            <label for="v-player-volume">音量</label>
+            <input type="range" min="0" max="100" step="1" id="v-player-volume">
+          </div>
+          <div class="item quality-switcher">
+            <label for="v-player-volume">画质</label>
+            <select id="v-player-quality">
+              <option value="1080p">1080p</option>
+            </select>
+          </div>
+          <div class="item">
+            <form method="dialog">
+              <button class="close-button button"><span class="text">关闭视频</span>${spanIcon('x')}</button>
+            </form>
+          </div>
+        </div>
       </div>
     `
     document.body.appendChild(playerDialog)
@@ -119,6 +129,12 @@ loadSettings().then((settings) => {
       const {video, audio} = selectMedias(playInfo)
       state.currentPlayer = createPlayer(video, audio)
       $playerContainer.append(state.currentPlayer.el)
+
+      // add video info
+      const videoInfoContent = (e.target as HTMLLinkElement).parentElement!.parentElement!
+      $('.player-panel .video-info').empty().append(
+        $(videoInfoContent).clone()
+      )
     })
 
     // load more when scroll to bottom
@@ -218,7 +234,7 @@ function initDynamicsColumn(container: Cash, name: string, title: string, uid: s
   $('<div class="title">').text(title).appendTo(column)
   const items = $('<div class="items">').appendTo(column)
   const actions = $('<div class="actions">').appendTo(column)
-  const loadMore = $('<button class="load-more">').text('加载更多').appendTo(actions)
+  const loadMore = $('<button class="load-more button">').text('加载更多').appendTo(actions)
 
   const state: ColumnState = {
     dynamicsSeq: 0,
@@ -249,14 +265,13 @@ async function loadDynamics(state: ColumnState, container: Cash, uid: string, ty
       let dateStr
       if (desc.bvid) {
         const card = _card as VideoCard
+        const description = card.desc
         innerHtml = `
           <div class="seq">${state.dynamicsSeq}</div>
-          ${divPreview(card.pic, card.desc)}
+          ${divPreview(card.pic, description)}
           <div class="content">
             <div class="title">
               <a href="https://www.bilibili.com/video/${desc.bvid}" target="_blank">${card.title}</a>
-            </div>
-            <div class="description">
             </div>
             <div class="meta">
               <span class="with-sep">${spanIcon('user')}<a href="https://space.bilibili.com/${desc.user_profile?.info.uid}" target="_blank">${desc.user_profile?.info.uname}</a></span
@@ -268,15 +283,17 @@ async function loadDynamics(state: ColumnState, container: Cash, uid: string, ty
                 ${spanIcon('star')}<span class="value">${card.stat.favorite}</span>
               </span>
             </div>
+            <div class="desc">${description}</div>
           </div>
         `
         dateStr = formatDate(card.pubdate)
       } else {
         const card = _card as BangumiCard
+        const description = card.apiSeasonInfo.title
         // console.log('bangumi card', card, item)
         innerHtml = `
           <div class="seq">${state.dynamicsSeq}</div>
-          ${divPreview(card.cover, card.apiSeasonInfo.title)}
+          ${divPreview(card.cover, description)}
           <div class="content">
             <div class="title">
               <a href="${card.url}" target="_blank">${card.new_desc}</a>
@@ -285,6 +302,7 @@ async function loadDynamics(state: ColumnState, container: Cash, uid: string, ty
               <span class="with-sep">${spanIcon('user')}${card.apiSeasonInfo.title}</span
               ><span>${spanIcon('calendar-time')}${hoursOrMinutesFrom(desc.timestamp)}</span
             </div>
+            <div class="desc">${description}</div>
           </div>
         `
         dateStr = formatDate(desc.timestamp)

@@ -11,7 +11,7 @@ import { readFile, writeFile } from 'node:fs/promises';
  * @type {Record<string, string[]>}
  */
 const icons = {
-	'tabler': ['coin-yuan', 'thumb-up', 'star', 'clock', 'calendar-time', 'user', 'user-circle'],
+	'tabler': ['coin-yuan', 'thumb-up', 'star', 'clock', 'calendar-time', 'user', 'user-circle', 'x'],
 };
 
 // Parse each icon set
