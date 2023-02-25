@@ -10,6 +10,7 @@ possible settings:
 - [ ] enable/disable different columns
 - [ ] enable/disable scroll to load
 - [x] enable/disable auto focus search bar
+- [ ] enable/disable hover seq to show preview
 - [ ] feed font size
 
 TODO:
@@ -154,8 +155,6 @@ interface BangumiCard {
   url: string
 }
 
-
-
 interface ColumnState {
   dynamicsSeq: number
   lastDynamicId: string|null
@@ -200,6 +199,7 @@ async function loadDynamics(state: ColumnState, container: Cash, uid: string, ty
         const card = _card as VideoCard
         innerHtml = `
           <div class="seq">${state.dynamicsSeq}</div>
+          ${divPreview(card.pic, card.desc)}
           <div class="content">
             <div class="title">
               <a href="https://www.bilibili.com/video/${desc.bvid}" target="_blank">${card.title}</a>
@@ -224,6 +224,7 @@ async function loadDynamics(state: ColumnState, container: Cash, uid: string, ty
         // console.log('bangumi card', card, item)
         innerHtml = `
           <div class="seq">${state.dynamicsSeq}</div>
+          ${divPreview(card.cover, card.apiSeasonInfo.title)}
           <div class="content">
             <div class="title">
               <a href="${card.url}" target="_blank">${card.new_desc}</a>
@@ -253,6 +254,17 @@ async function loadDynamics(state: ColumnState, container: Cash, uid: string, ty
 
 function spanIcon(icon: string) {
   return `<span class="icon icon--tabler icon--tabler--${icon}"></span>`
+}
+
+function divPreview(img: string, desc: string) {
+  return `
+    <div class="preview">
+      <div class="inner">
+        <img src="${img}">
+        <div class="desc">简介: ${desc}</div>
+      </div>
+    </div>
+  `
 }
 
 function detectScrollToBottom(callback: () => Promise<void>) {
