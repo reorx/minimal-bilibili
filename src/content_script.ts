@@ -1,5 +1,8 @@
 import $, { Cash } from 'cash-dom';
+import delegate from 'delegate-it';
 
+import { parseBV, selectMedias } from './bilibili';
+import { createPlayer, Player } from './player';
 import { loadSettings } from './settings';
 import { colors, getLogger } from './utils/log';
 import { formatDate, formatDuration, hoursOrMinutesFrom } from './utils/misc';
@@ -25,6 +28,10 @@ lg.info('content_script.ts');
 const TYPE_LIST = {
   VIDEO: '8',
   BANGUMI: '512,4097,4098,4099,4100,4101',
+}
+
+const state: {currentPlayer: Player|null} = {
+  currentPlayer: null,
 }
 
 /* main */
@@ -68,6 +75,51 @@ loadSettings().then((settings) => {
     loadMoreFuncs.push(
       initDynamicsColumn(container, 'right', '番剧', uid, TYPE_LIST.BANGUMI)
     )
+
+    // create player dialog
+    const playerDialog = document.createElement('dialog')
+    playerDialog.classList.add('player-dialog')
+    playerDialog.innerHTML = `
+      <form method="dialog">
+        <button class="close-button">X</button>
+      </form>
+      <div class="video-info">
+        <div class="title"></div>
+        <div class="author"></div>
+      </div>
+      <div class="player-container"></div>
+      <div class="player-controls">
+        <div class="volume-slider"></div>
+        <div class="quality-switcher"></div>
+      </div>
+    `
+    document.body.appendChild(playerDialog)
+
+    playerDialog.addEventListener('close', () => {
+      if (state.currentPlayer) {
+        state.currentPlayer.destroy()
+      }
+    })
+
+    // listen to video link click
+    delegate(container.get(0) as HTMLDivElement, '.dynamic-item .title a', 'click', async (e) => {
+      e.preventDefault()
+      playerDialog.showModal()
+      if (state.currentPlayer) {
+        state.currentPlayer.destroy()
+      }
+
+      const url = (e.target as HTMLLinkElement).href
+      const resp = await fetch(url)
+      const html = await resp.text()
+      const playInfo = await parseBV(html, url)
+      const $playerContainer = $('.player-container')
+
+      // select video and audio
+      const {video, audio} = selectMedias(playInfo)
+      state.currentPlayer = createPlayer(video, audio)
+      $playerContainer.append(state.currentPlayer.el)
+    })
 
     // load more when scroll to bottom
     detectScrollToBottom(async () => {
