@@ -143,6 +143,8 @@ loadSettings().then((settings) => {
       // create player
       const player = new Player(playInfo)
       $playerContainer.append(player.el)
+      // focus on video so that user can use keyboard to control
+      player.elVideo.focus()
 
       // update player controls
       player.initVolumeSlider($('#v-player-volume'))

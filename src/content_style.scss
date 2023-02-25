@@ -251,6 +251,10 @@ body {
       // dialog default border;
       border: 3px solid #000;
       background-color: #000;
+      &:focus {
+        outline: 0;
+        box-shadow: none;
+      }
     }
   }
 
