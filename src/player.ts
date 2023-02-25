@@ -41,7 +41,7 @@ export class Player {
 
     const elVideo = createVideo(video.baseUrl, video.mimeType, 640)
     this.usedAudioBackupUrls[audio.baseUrl] = true
-    const elAudio = createAudio(audio.baseUrl, 'audio/mp4')
+    const elAudio = createAudio(audio.baseUrl, 'audio/mp4', this.preference.volume)
 
     this.el.appendChild(elVideo)
     this.el.appendChild(elAudio)
@@ -223,10 +223,10 @@ function createVideo(src: string, type: string, width: number) {
   return video
 }
 
-function createAudio(src: string, type: string) {
+function createAudio(src: string, type: string, volume: number) {
   const audio = document.createElement('audio')
   // audio.controls = true
-  audio.volume = 0.8
+  audio.volume = volume / 100
 
   // add source
   const source = document.createElement('source')
