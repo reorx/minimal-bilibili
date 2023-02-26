@@ -18,6 +18,11 @@ possible settings:
 
 TODO:
 - [x] hover seq number to show preview
+- [ ] remember watched status in local storage
+- [ ] add toggle to show/hide watched videos
+- [ ] play-controls: mark watched/unwatched
+- [ ] paginator: next/prev video
+- [ ] error handling for video page parsing
 - [ ] column for recommendations
 - [ ] like, tip, fav buttons
 */
