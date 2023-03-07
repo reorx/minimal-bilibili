@@ -20,8 +20,9 @@ TODO:
 - [x] hover seq number to show preview
 - [ ] remember watched status in local storage
 - [ ] add toggle to show/hide watched videos
+- [ ] list: rightmost button that marks watched/unwatched, and shows preview
 - [ ] play-controls: mark watched/unwatched
-- [ ] paginator: next/prev video
+- [ ] paginator: next/prev video, close button in the middle
 - [ ] error handling for video page parsing
 - [ ] column for recommendations
 - [ ] like, tip, fav buttons
@@ -43,12 +44,16 @@ const state: {currentPlayer: Player|null} = {
 /* main */
 
 loadSettings().then((settings) => {
-  if (settings.autoFocusSearchBar) {
-    setTimeout(() => {
-      const searchInput = document.querySelector('input.nav-search-input') as HTMLInputElement
+  setTimeout(() => {
+    const searchInput = document.querySelector('input.nav-search-input') as HTMLInputElement
+    // remove placeholder and title
+    searchInput.placeholder = ''
+    searchInput.title = ''
+    // focus
+    if (settings.autoFocusSearchBar) {
       searchInput.focus()
-    }, 1000);
-  }
+    }
+  }, 1000);
 
   // remove download button
   const downloadLink = document.querySelector('.download-client-trigger')
