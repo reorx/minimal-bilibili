@@ -5,9 +5,11 @@ const ExtReloader = require('@reorx/webpack-ext-reloader')
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const { merge } = require('webpack-merge')
 
+const target = process.env.TARGET || 'chrome'
+console.log(`build target: ${target}`)
 const rootDir = path.resolve(__dirname)
 const srcDir = path.join(rootDir, 'src')
-const destDir = path.join(rootDir, 'build')
+const destDir = path.join(rootDir, 'build', target)
 
 console.log('srcDir', srcDir)
 
@@ -64,7 +66,10 @@ const common = {
   },
   plugins: [
     new CopyPlugin({
-      patterns: [{ from: path.join(rootDir, 'public'), to: destDir }],
+      patterns: [
+        { from: path.join(rootDir, 'public'), to: destDir },
+        target === 'firefox' ? { from: path.join(rootDir, 'firefox/public'), to: destDir } : null,
+      ].filter(Boolean),
     }),
   ],
 }

@@ -1,9 +1,11 @@
 #!/bin/bash
 
-dist_dir="$PWD/dist"
-build_dir="$PWD/build"
+: ${TARGET:=chrome}
+echo "pack target: ${TARGET}"
+dist_dir="$PWD/dist/${TARGET}"
+build_dir="$PWD/build/${TARGET}"
 package_name="minimal-bilibili"
-manifest_path="public/manifest.json"
+manifest_path="$build_dir/manifest.json"
 
 version=$(grep '"version' "$manifest_path" | grep -Eo '\d.\d.\d')
 if [ -z "$version" ]; then
