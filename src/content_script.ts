@@ -133,9 +133,17 @@ loadSettings().then((settings) => {
       }
     })
 
+    playerDialog.addEventListener('click', (e) => {
+      // close playerDialog if click on the backdrop
+      if (playerDialog.open && e.target === playerDialog) {
+        playerDialog.close()
+      }
+    })
+
     // listen to video link click
     delegate(container.get(0) as HTMLDivElement, '.left-column .dynamic-item .title a', 'click', async (e) => {
       e.preventDefault();
+      e.stopPropagation();
       // mark visited
       (e.target as HTMLLinkElement).classList.add('visited');
 
