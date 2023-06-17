@@ -30,10 +30,12 @@ export class Player {
   preference: PlayerPreference
   usedVideoBackupUrls: {[key: string]: boolean} = {}
   usedAudioBackupUrls: {[key: string]: boolean} = {}
+  quality?: number
 
-  constructor(playInfo: PlayInfo) {
+  constructor(playInfo: PlayInfo, quality?: number) {
     this.playInfo = playInfo
-    const {video, audio} = selectMedias(playInfo)
+    this.quality = quality
+    const {video, audio} = selectMedias(playInfo, quality)
 
     this.el = document.createElement('div')
     this.el.id = "minimal-bilibili-player"

@@ -37,7 +37,12 @@ const TYPE_LIST = {
   BANGUMI: '512,4097,4098,4099,4100,4101',
 }
 
-const state: {currentPlayer: Player|null} = {
+interface State {
+  currentPlayer: Player|null
+  quality?: number
+}
+
+const state: State = {
   currentPlayer: null,
 }
 
@@ -123,8 +128,10 @@ loadSettings().then((settings) => {
     })
     delegate(playerDialog, '#v-player-quality', 'change', (e) => {
       console.log('change quality', (e.target as HTMLSelectElement).value)
-      if (state.currentPlayer)
-        state.currentPlayer.switchQuality(parseInt((e.target as HTMLSelectElement).value))
+      if (state.currentPlayer) {
+        state.quality = parseInt((e.target as HTMLSelectElement).value)
+        state.currentPlayer.switchQuality(state.quality)
+      }
     })
 
     playerDialog.addEventListener('close', () => {
@@ -159,7 +166,7 @@ loadSettings().then((settings) => {
       const $playerContainer = $('.player-container')
 
       // create player
-      const player = new Player(playInfo)
+      const player = new Player(playInfo, state.quality)
       $playerContainer.append(player.el)
       // focus on video so that user can use keyboard to control
       player.elVideo.focus()
