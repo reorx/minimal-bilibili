@@ -5,7 +5,7 @@ export interface Settings {
 }
 
 export const defaultSettings: Settings = {
-  autoFocusSearchBar: true,
+  autoFocusSearchBar: false,
   autoLoadVideoColumn: true,
   autoLoadBangumiColumn: true,
 }
