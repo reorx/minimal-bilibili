@@ -124,16 +124,22 @@ body {
     position: relative;
 
     .seq {
+      display: block;
       width: 25px;
       text-align: right;
       padding-right: 5px;
-      padding-top: 3px;
+      padding-top: 4px;
       margin-right: 10px;
       font-size: 14px;
       cursor: pointer;
       position: relative;
       z-index: 2;
+      flex-shrink: 0;
+      line-height: 1.6;
 
+      &:hover {
+        text-decoration: underline;
+      }
       &:hover + .preview {
         display: block;
       }

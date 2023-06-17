@@ -141,7 +141,7 @@ loadSettings().then((settings) => {
     })
 
     // listen to video link click
-    delegate(container.get(0) as HTMLDivElement, '.left-column .dynamic-item .title a', 'click', async (e) => {
+    delegate(container.get(0) as HTMLDivElement, '.left-column .dynamic-item .title a.open-player', 'click', async (e) => {
       e.preventDefault();
       e.stopPropagation();
       // mark visited
@@ -309,11 +309,11 @@ async function loadDynamics(state: ColumnState, container: Cash, uid: string, ty
         const card = _card as VideoCard
         const description = card.desc
         innerHtml = `
-          <div class="seq">${state.dynamicsSeq}</div>
+          <a href="https://www.bilibili.com/video/${desc.bvid}" target="_blank" class="seq">${state.dynamicsSeq}</a>
           ${divPreview(card.pic, description)}
           <div class="content">
             <div class="title">
-              <a href="https://www.bilibili.com/video/${desc.bvid}" target="_blank">${card.title}</a>
+              <a href="https://www.bilibili.com/video/${desc.bvid}" target="_blank" class="open-player">${card.title}</a>
             </div>
             <div class="meta">
               <span class="with-sep">${spanIcon('user')}<a href="https://space.bilibili.com/${desc.user_profile?.info.uid}" target="_blank">${desc.user_profile?.info.uname}</a></span
@@ -334,7 +334,7 @@ async function loadDynamics(state: ColumnState, container: Cash, uid: string, ty
         const description = card.apiSeasonInfo.title
         // console.log('bangumi card', card, item)
         innerHtml = `
-          <div class="seq">${state.dynamicsSeq}</div>
+          <a href="https://www.bilibili.com/video/${desc.bvid}" target="_blank" class="seq">${state.dynamicsSeq}</a>
           ${divPreview(card.cover, description)}
           <div class="content">
             <div class="title">
