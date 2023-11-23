@@ -32,52 +32,60 @@ function processVideoPage() {
 
 
 function captureVideoImage(videoEl: HTMLVideoElement, saveToFile: boolean = false) {
+  if (2 > videoEl.readyState) {
+    lg.info('video not ready to capture')
+    return
+  }
+
   const clock = formatTimeClock(videoEl.currentTime);
   const clipboardCallback = () => {
     createToastIn(`📋 Screenshot ${clock} copied.`, videoEl.parentElement!)
   }
+  const downloadCallback = () => {
+    createToastIn(`📋 Screenshot ${clock} downloaded.`, videoEl.parentElement!)
+  }
   const imageFormat = "png";
   const filename = getScreenshotFilename(videoEl, imageFormat)
 
-  if (videoEl && !(2 > videoEl.readyState)) {
-    if ("BWP-VIDEO" === videoEl.tagName) {
-      if ((videoEl as any).toDataURL) {
-        const videoAsCanvas = videoEl as any as HTMLCanvasElement
-        if (!saveToFile) {
-          const dataUrl = videoAsCanvas.toDataURL().split(",");
-          const _mimeType = dataUrl[0].match(/:(.*?);/)
-          if (!_mimeType) {
-            throw 'mimeType not found'
-          }
-          const mimeType = _mimeType[1];
-          const binaryData = atob(dataUrl[1]);
-          const length = binaryData.length;
-          const dataArray = new Uint8Array(length);
-          for (let i = length; i--;) {
-            dataArray[i] = binaryData.charCodeAt(i);
-          }
-          const blob = new Blob([dataArray], {
-            type: mimeType
-          });
-          saveImageToClipboard(blob).then(clipboardCallback);
-        } else {
-          downloadDataUrl(videoAsCanvas.toDataURL(), filename);
-        }
-      }
-    } else {
-      const canvasEl = document.createElement("canvas")
-      canvasEl.width = videoEl.videoWidth;
-      canvasEl.height = videoEl.videoHeight;
-      canvasEl.getContext("2d")!.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
+  if ("BWP-VIDEO" === videoEl.tagName) {
+    if ((videoEl as any).toDataURL) {
+      const videoAsCanvas = videoEl as any as HTMLCanvasElement
       if (!saveToFile) {
-        canvasEl.toBlob((blob) => {
-          if (blob) {
-            saveImageToClipboard(blob).then(clipboardCallback);
-          }
+        const dataUrl = videoAsCanvas.toDataURL().split(",");
+        const _mimeType = dataUrl[0].match(/:(.*?);/)
+        if (!_mimeType) {
+          throw 'mimeType not found'
+        }
+        const mimeType = _mimeType[1];
+        const binaryData = atob(dataUrl[1]);
+        const length = binaryData.length;
+        const dataArray = new Uint8Array(length);
+        for (let i = length; i--;) {
+          dataArray[i] = binaryData.charCodeAt(i);
+        }
+        const blob = new Blob([dataArray], {
+          type: mimeType
         });
+        saveImageToClipboard(blob).then(clipboardCallback);
       } else {
-        downloadDataUrl(canvasEl.toDataURL(`image/${imageFormat}`, .98), filename);
+        downloadDataUrl(videoAsCanvas.toDataURL(), filename);
+        downloadCallback()
       }
+    }
+  } else {
+    const canvasEl = document.createElement("canvas")
+    canvasEl.width = videoEl.videoWidth;
+    canvasEl.height = videoEl.videoHeight;
+    canvasEl.getContext("2d")!.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
+    if (!saveToFile) {
+      canvasEl.toBlob((blob) => {
+        if (blob) {
+          saveImageToClipboard(blob).then(clipboardCallback);
+        }
+      });
+    } else {
+      downloadDataUrl(canvasEl.toDataURL(`image/${imageFormat}`, .98), filename);
+      downloadCallback()
     }
   }
 }
