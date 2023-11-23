@@ -1,3 +1,26 @@
 .video {
   color: inherit;
 }
+
+.bpx-player-video-wrap {
+  position: relative;
+}
+
+$video-toast-width: 220px;
+
+.minimal-bilibili-video-toast {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  margin-left: calc($video-toast-width / -2);
+  width: $video-toast-width;
+  height: 40px;
+  z-index: 99;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(200, 200, 200, 0.7);
+  color: #333;
+  font-size: 15px;
+  border-radius: 4px;
+}

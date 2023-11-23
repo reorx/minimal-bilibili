@@ -27,10 +27,17 @@ function processVideoPage() {
       }
     }
   }, true)
+
 }
 
+
 function captureVideoImage(videoEl: HTMLVideoElement, saveToFile: boolean = false) {
+  const clock = formatTimeClock(videoEl.currentTime);
+  const clipboardCallback = () => {
+    createToastIn(`📋 Screenshot ${clock} copied.`, videoEl.parentElement!)
+  }
   const imageFormat = "png";
+  const filename = getScreenshotFilename(videoEl, imageFormat)
 
   if (videoEl && !(2 > videoEl.readyState)) {
     if ("BWP-VIDEO" === videoEl.tagName) {
@@ -52,9 +59,9 @@ function captureVideoImage(videoEl: HTMLVideoElement, saveToFile: boolean = fals
           const blob = new Blob([dataArray], {
             type: mimeType
           });
-          saveImageToClipboard(blob);
+          saveImageToClipboard(blob).then(clipboardCallback);
         } else {
-          downloadDataUrl(videoAsCanvas.toDataURL(), getScreenshotFilename(videoEl, imageFormat));
+          downloadDataUrl(videoAsCanvas.toDataURL(), filename);
         }
       }
     } else {
@@ -65,18 +72,26 @@ function captureVideoImage(videoEl: HTMLVideoElement, saveToFile: boolean = fals
       if (!saveToFile) {
         canvasEl.toBlob((blob) => {
           if (blob) {
-            saveImageToClipboard(blob);
+            saveImageToClipboard(blob).then(clipboardCallback);
           }
         });
       } else {
-        downloadDataUrl(canvasEl.toDataURL(`image/${imageFormat}`, .98), getScreenshotFilename(videoEl, imageFormat));
+        downloadDataUrl(canvasEl.toDataURL(`image/${imageFormat}`, .98), filename);
       }
     }
   }
 }
 
+function formatTimeClock(time: number, sep: string = ':'): string {
+  const minutes = Math.floor(time / 60).toString().padStart(2, '0');
+  const seconds = Math.floor(time % 60).toString().padStart(2, '0');
+  return `${minutes}${sep}${seconds}`;
+}
+
 function getScreenshotFilename(videoEl: HTMLVideoElement, imageFormat: string) {
-  return `screenshot-${videoEl.currentTime.toFixed(3)}.${imageFormat}`
+  const htmlTitle = document.title;
+  const title = htmlTitle.split('_bilibili')[0]
+  return `${title}_${formatTimeClock(videoEl.currentTime, '-')}.${imageFormat}`
 }
 
 function downloadDataUrl(dataUrl: string, filename: string) {
@@ -87,11 +102,36 @@ function downloadDataUrl(dataUrl: string, filename: string) {
 }
 
 function saveImageToClipboard(imageBlob: Blob) {
-  navigator.clipboard.write([new ClipboardItem({
+  return navigator.clipboard.write([new ClipboardItem({
     [imageBlob.type]: imageBlob
   })]).then(function() {
     lg.info('Image copied.');
   }).catch(error => console.error(error));
+}
+
+function createToastIn(text: string, parentEl: HTMLElement) {
+  const toast = document.createElement('div');
+  toast.className = 'minimal-bilibili-video-toast';
+  toast.style.opacity = '0'; // Set initial opacity to 0
+  toast.style.transition = 'opacity 0.5s'; // Add transition effect
+
+  const toastContent = document.createElement('div');
+  toastContent.textContent = text
+  toast.appendChild(toastContent);
+  parentEl.appendChild(toast);
+
+  // Fade in the toast
+  setTimeout(() => {
+    toast.style.opacity = '1';
+  }, 0);
+
+  // Fade out the toast after 1 second
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    setTimeout(() => {
+      parentEl.removeChild(toast);
+    }, 500); // Remove toast element after fade out
+  }, 1000);
 }
 
 class RetryLoop {
