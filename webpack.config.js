@@ -19,6 +19,8 @@ const common = {
     options: path.join(srcDir, 'options.ts'),
     content_script: path.join(srcDir, 'content_script.ts'),
     content_style: path.join(srcDir, 'content_style.scss'),
+    video_content_script: path.join(srcDir, 'video_content_script.ts'),
+    video_content_style: path.join(srcDir, 'video_content_style.scss'),
   },
   output: {
     path: destDir,
@@ -85,7 +87,7 @@ function developmentConfig() {
       new ExtReloader({
         entries: {
           background: 'background',
-          contentScript: ['content_script', 'content_style'],
+          contentScript: ['content_script', 'content_style', 'video_content_script', 'video_content_style'],
         },
       }),
       new webpack.DefinePlugin({

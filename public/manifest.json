@@ -16,6 +16,11 @@
       "matches": ["https://www.bilibili.com/", "https://www.bilibili.com/?*"],
       "css": ["css/content_style.css"],
       "js": ["js/content_script.js"]
+    },
+    {
+      "matches": ["https://www.bilibili.com/video/*"],
+      "css": ["css/video_content_style.css"],
+      "js": ["js/video_content_script.js"]
     }
   ],
   "permissions": [
