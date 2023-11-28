@@ -4,15 +4,19 @@ import { colors, getLogger } from './utils/log';
 const lg = getLogger('video_content_script', colors.blue)
 
 function getVideoEl(): HTMLVideoElement | null {
-  return document.querySelector('#bilibiliPlayer video,#bilibili-player video,.bilibili-player video,.player-container video,#bilibiliPlayer bwp-video,#bilibili-player bwp-video,.bilibili-player bwp-video,.player-container bwp-video,#bofqi video,[aria-label="\u54d4\u54e9\u54d4\u54e9\u64ad\u653e\u5668"] video')
+  // switch case domain
+  const domain = location.hostname
+  switch (domain) {
+    case 'www.bilibili.com':
+      return document.querySelector('#bilibiliPlayer video,#bilibili-player video,.bilibili-player video,.player-container video,#bilibiliPlayer bwp-video,#bilibili-player bwp-video,.bilibili-player bwp-video,.player-container bwp-video,#bofqi video,[aria-label="\u54d4\u54e9\u54d4\u54e9\u64ad\u653e\u5668"] video')
+    case 'www.youtube.com':
+      return document.querySelector('.html5-video-container video')
+    default:
+      return null
+  }
 }
 
 function processVideoPage() {
-  const videoEl = getVideoEl()
-  if (!videoEl) {
-    lg.error('video element not found')
-    return
-  }
 
   document.addEventListener('keydown', (e: KeyboardEvent) => {
     const target = e.target as HTMLElement
