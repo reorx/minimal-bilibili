@@ -10,8 +10,7 @@ import { formatDate, formatDuration, hoursOrMinutesFrom } from './utils/misc';
 
 /*
 possible settings:
-- [ ] enable/disable different columns
-- [ ] enable/disable scroll to load
+- [x] enable/disable scroll to load
 - [x] enable/disable auto focus search bar
 - [ ] enable/disable hover seq to show preview
 - [ ] feed font size
@@ -26,6 +25,7 @@ TODO:
 - [ ] error handling for video page parsing
 - [ ] column for recommendations
 - [ ] like, tip, fav buttons
+- [ ] add video to bilibili history
 */
 
 
