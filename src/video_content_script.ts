@@ -27,6 +27,12 @@ function processVideoPage() {
       // console.log('keyCode', keyCode, e.shiftKey)
       if (keyCode === 'KeyS') {
         console.log('s pressed, shiftKey: ', e.shiftKey)
+        const videoEl = getVideoEl()
+        if (!videoEl) {
+          lg.warn('video element not found')
+          return
+        }
+
         captureVideoImage(videoEl, e.shiftKey)
       }
     }
@@ -146,40 +152,5 @@ function createToastIn(text: string, parentEl: HTMLElement) {
   }, 1000);
 }
 
-class RetryLoop {
-  private interval: number;
-  private maxRetry: number;
-  private retryCount: number;
 
-  constructor(interval: number, maxRetry: number) {
-    this.interval = interval;
-    this.maxRetry = maxRetry;
-    this.retryCount = 0;
-  }
-
-  start(fn: () => boolean) {
-    const loop = () => {
-      if (fn()) {
-        return;
-      }
-      console.log('RetryLoop fn returns false, retryCount:', this.retryCount)
-
-      if (this.retryCount < this.maxRetry) {
-        this.retryCount++;
-        setTimeout(loop, this.interval);
-      }
-      console.log('RetryLoop reached max retry count')
-    };
-
-    setTimeout(loop, this.interval);
-  }
-}
-
-new RetryLoop(1000, 30).start(() => {
-  lg.log('fn called')
-  const hasVideoEl = !!getVideoEl()
-  if (hasVideoEl) {
-    setTimeout(processVideoPage)
-  }
-  return hasVideoEl
-})
+setTimeout(processVideoPage, 1000)
