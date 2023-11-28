@@ -19,10 +19,6 @@ $autoLoadVideoColumn.on('change', () => {
   store.settings.autoLoadVideoColumn = $autoLoadVideoColumn.prop('checked')
 })
 
-const $autoLoadBangumiColumn = $('#v-auto-load-bangumi-column')
-$autoLoadBangumiColumn.on('change', () => {
-  store.settings.autoLoadBangumiColumn = $autoLoadBangumiColumn.prop('checked')
-})
 
 $('#fn-save').on('click', () => {
   chrome.storage.sync.set({
@@ -37,5 +33,4 @@ loadSettings().then((settings) => {
   // load settings to UI
   $autoFocus.prop('checked', store.settings.autoFocusSearchBar)
   $autoLoadVideoColumn.prop('checked', store.settings.autoLoadVideoColumn)
-  $autoLoadBangumiColumn.prop('checked', store.settings.autoLoadBangumiColumn)
 })

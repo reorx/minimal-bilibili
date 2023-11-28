@@ -1,13 +1,11 @@
 export interface Settings {
   autoFocusSearchBar: boolean
   autoLoadVideoColumn: boolean
-  autoLoadBangumiColumn: boolean
 }
 
 export const defaultSettings: Settings = {
   autoFocusSearchBar: false,
   autoLoadVideoColumn: true,
-  autoLoadBangumiColumn: true,
 }
 
 export async function loadSettings(): Promise<Settings> {

@@ -86,12 +86,9 @@ loadSettings().then((settings) => {
     // init columns
     const loadMoreFuncs: Array<() => Promise<void>> = []
 
-    const loadMoreVideos = initDynamicsColumn(container, 'left', '视频', uid, TYPE_LIST.VIDEO)
+    const loadMoreVideos = initDynamicsColumn(container, 'left', '动态', uid, TYPE_LIST.VIDEO)
     if (settings.autoLoadVideoColumn)
       loadMoreFuncs.push(loadMoreVideos)
-    const loadMoreBangumi = initDynamicsColumn(container, 'right', '番剧', uid, TYPE_LIST.BANGUMI)
-    if (settings.autoLoadBangumiColumn)
-      loadMoreFuncs.push(loadMoreBangumi)
 
     // create player dialog
     const playerDialog = document.createElement('dialog')
