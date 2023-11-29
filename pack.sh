@@ -7,6 +7,7 @@ build_dir="$PWD/build/${TARGET}"
 package_name="minimal-bilibili"
 manifest_path="$build_dir/manifest.json"
 
+# version
 version=$(grep '"version' "$manifest_path" | grep -Eo '\d.\d.\d')
 if [ -z "$version" ]; then
     echo "cannot get version"
@@ -14,6 +15,11 @@ if [ -z "$version" ]; then
 fi
 filename="${package_name}-$version.zip"
 
+# build
+rm -rf "$build_dir"
+npm run build
+
+# pack
 pushd "$build_dir"
 zip $filename * -vr -x 'types*'
 mkdir -p "$dist_dir"

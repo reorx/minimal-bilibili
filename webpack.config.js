@@ -81,7 +81,8 @@ function developmentConfig() {
   console.log('development config')
   const config = merge(common, {
     // `eval` could not be used, see https://stackoverflow.com/questions/48047150/chrome-extension-compiled-by-webpack-throws-unsafe-eval-error
-    devtool: 'cheap-module-source-map',
+    // devtool: 'cheap-module-source-map',
+    devtool: false,
     mode: 'development',
     plugins: [
       new ExtReloader({
