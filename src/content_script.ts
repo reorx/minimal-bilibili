@@ -56,6 +56,7 @@ loadSettings().then((settings) => {
     // show recommend
     const recContainer = $('.recommended-container_floor-aside')
     $('<div class="section-title">').text('推荐').prependTo(recContainer)
+    observeRecommendAds()
   }
 
   setTimeout(() => {
@@ -410,4 +411,59 @@ function detectScrollToBottom(callback: () => Promise<void>) {
       isDoing = false
     }
   });
+}
+
+function observeRecommendAds() {
+
+  const targetNode = document.querySelector('.recommended-container_floor-aside .container') as HTMLDivElement
+
+  const debouncedRemoveAds = runOnceInTime(() => removeAdsIn(targetNode), 200)
+
+  // Callback function to execute when mutations are observed
+  const callback: MutationCallback = (mutationsList: MutationRecord[], observer: MutationObserver) => {
+    for (const mutation of mutationsList) {
+      if (mutation.type === 'childList') {
+        // do something because child elements have changed
+        // console.log('A child node has been added or removed.')
+        debouncedRemoveAds()
+      }
+    }
+  };
+
+  // Create an observer instance linked to the callback function
+  const observer = new MutationObserver(callback);
+
+  // Options for the observer (which mutations to observe)
+  const config: MutationObserverInit = { childList: true };
+
+  // Start observing the target node for configured mutations
+  observer.observe(targetNode, config);
+}
+
+function runOnceInTime(fn: () => void, interval: number): () => void {
+  let timerId: NodeJS.Timeout | null = null;
+
+  return () => {
+    if (timerId === null) {
+      setTimeout(fn, 200);
+      timerId = setTimeout(() => {
+        timerId = null;
+      }, interval);
+    }
+  };
+}
+
+function removeAdsIn(el: HTMLElement) {
+  lg.info('removeAds')
+  const $el = $(el)
+  $el.find('.bili-video-card__info--ad, bili-video-card__info--creative-ad').each((i, el) => {
+    const videoCard = $(el).closest('.bili-video-card')
+    const parent = videoCard.parent()
+    if (parent.hasClass('feed-card')) {
+      parent.remove()
+    } else {
+      videoCard.remove()
+    }
+  })
+  $el.find('.bili-live-card').remove()
 }
