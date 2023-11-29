@@ -456,7 +456,7 @@ function runOnceInTime(fn: () => void, interval: number): () => void {
 function removeAdsIn(el: HTMLElement) {
   lg.info('removeAds')
   const $el = $(el)
-  $el.find('.bili-video-card__info--ad, bili-video-card__info--creative-ad').each((i, el) => {
+  $el.find('.bili-video-card__info--ad, .bili-video-card__info--creative-ad').each((i, el) => {
     const videoCard = $(el).closest('.bili-video-card')
     const parent = videoCard.parent()
     if (parent.hasClass('feed-card')) {
