@@ -67,7 +67,7 @@ body {
   margin-top: 80px;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 32px;
+  gap: 24px;
 
   // make recommend starts from the second column even at the very beginning
   .recommended-container_floor-aside {
@@ -80,6 +80,7 @@ body {
 
 /* recommend styles */
 .recommended-container_floor-aside {
+
   .recommended-swipe {
     display: none;
   }
@@ -90,6 +91,13 @@ body {
   .container.is-version8 {
     margin-top: 32px;
     grid-template-columns: repeat(3,1fr);
+
+    max-height: 600px;
+    overflow-y: auto;
+    border: 1px solid #aaa;
+    padding: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
     > div {
       margin-top: 0 !important;
       margin-bottom: 20px;
