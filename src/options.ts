@@ -9,6 +9,11 @@ const store: {settings: Settings} = {
   settings: {...defaultSettings},
 }
 
+const $showRecommend = $('#v-show-recommend')
+$showRecommend.on('change', () => {
+  store.settings.showRecommend = $showRecommend.prop('checked')
+})
+
 const $autoFocus = $('#v-auto-focus')
 $autoFocus.on('change', () => {
   store.settings.autoFocusSearchBar = $autoFocus.prop('checked')
@@ -31,6 +36,7 @@ loadSettings().then((settings) => {
   console.log('loaded settings', store.settings)
 
   // load settings to UI
+  $showRecommend.prop('checked', store.settings.showRecommend)
   $autoFocus.prop('checked', store.settings.autoFocusSearchBar)
   $autoLoadVideoColumn.prop('checked', store.settings.autoLoadVideoColumn)
 })

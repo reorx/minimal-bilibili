@@ -49,6 +49,15 @@ const state: State = {
 /* main */
 
 loadSettings().then((settings) => {
+  lg.info('loaded settings', settings)
+  if (settings.showRecommend) {
+    lg.info('showRecommend is enabled')
+
+    // show recommend
+    const recContainer = $('.recommended-container_floor-aside')
+    $('<div class="section-title">').text('推荐').prependTo(recContainer)
+  }
+
   setTimeout(() => {
     const searchInput = document.querySelector('input.nav-search-input') as HTMLInputElement
     // remove placeholder and title
@@ -80,8 +89,8 @@ loadSettings().then((settings) => {
     // console.log('uid', uid)
 
     // create container
-    const dynamicsParent = $('.bili-feed4')
-    const container = $('<div class="dynamics-container">').appendTo(dynamicsParent)
+    const dynamicsParent = $('.feed2')
+    const container = $('<div class="dynamics-container">').prependTo(dynamicsParent)
 
     // init columns
     const loadMoreFuncs: Array<() => Promise<void>> = []
@@ -277,7 +286,7 @@ interface ColumnState {
 function initDynamicsColumn(container: Cash, name: string, title: string, uid: string, type_list: string) {
 
   const column = $(`<section class="${name}-column">`).appendTo(container)
-  $('<div class="title">').text(title).appendTo(column)
+  $('<div class="section-title">').text(title).appendTo(column)
   const items = $('<div class="items">').appendTo(column)
   const actions = $('<div class="actions">').appendTo(column)
   const loadMore = $('<button class="load-more button">').text('加载更多').appendTo(actions)

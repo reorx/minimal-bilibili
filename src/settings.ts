@@ -1,9 +1,11 @@
 export interface Settings {
+  showRecommend: boolean
   autoFocusSearchBar: boolean
   autoLoadVideoColumn: boolean
 }
 
 export const defaultSettings: Settings = {
+  showRecommend: true,
   autoFocusSearchBar: false,
   autoLoadVideoColumn: true,
 }

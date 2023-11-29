@@ -11,11 +11,9 @@
 }
 
 
-html body {
-  background-color: #fff;
-}
-
 body {
+  background-color: #fff;
+
   .center-search-container {
     position: absolute;
     left: 50vw;
@@ -39,10 +37,6 @@ body {
     }
   }
 
-  .bili-feed4-layout {
-    display: none;
-  }
-
   .palette-button-outer {
     display: none;
   }
@@ -50,13 +44,62 @@ body {
   .trending {
     display: none;
   }
+
+  .button {
+    padding: 8px 15px;
+    background: #f3f3f3;
+    &:hover {
+      background: #eee;
+    }
+  }
+
+  .feed2 {
+    .section-title {
+      font-size: 20px;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+  }
 }
 
-.button {
-  padding: 8px 15px;
-  background: #f3f3f3;
-  &:hover {
-    background: #eee;
+/* container layout */
+.feed2 {
+  margin-top: 80px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+
+  // make recommend starts from the second column even at the very beginning
+  .recommended-container_floor-aside {
+    grid-column-start: 2;
+  }
+  .dynamics-container {
+    grid-column-start: 1;
+  }
+}
+
+/* recommend styles */
+.recommended-container_floor-aside {
+  .recommended-swipe {
+    display: none;
+  }
+  .floor-single-card {
+    display: none;
+  }
+
+  .container.is-version8 {
+    margin-top: 32px;
+    grid-template-columns: repeat(3,1fr);
+    > div {
+      margin-top: 0 !important;
+      margin-bottom: 20px;
+    }
+  }
+  .feed-roll-btn {
+    position: fixed !important;
+    right: 0px !important;
+    left: auto !important;
+    top: 300px !important;
   }
 }
 
@@ -64,28 +107,13 @@ body {
 
 .dynamics-container {
   margin: 0 auto;
-  margin-top: 80px;
   font-size: 16px;
   padding-bottom: 50px;
 
   display: flex;
   justify-content: center;
 
-  width: 100vw;
   margin-left: 0; margin-right: 0;
-
-
-  > section {
-    @media screen and (min-width: 800px) {
-      width: 750px;
-    }
-
-    > .title {
-      font-size: 20px;
-      text-align: center;
-      margin-bottom: 12px;
-    }
-  }
 
   .date-separator {
     text-align: center;
@@ -122,7 +150,7 @@ body {
   }
 
   .dynamic-item {
-    margin-bottom: 10px;
+    margin-bottom: 16px;
     color: #aaa;
     display: flex;
     position: relative;
