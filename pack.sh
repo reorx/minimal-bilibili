@@ -7,6 +7,10 @@ build_dir="$PWD/build/${TARGET}"
 package_name="minimal-bilibili"
 manifest_path="$build_dir/manifest.json"
 
+# build
+rm -rf "$build_dir"
+npm run build
+
 # version
 version=$(grep '"version' "$manifest_path" | grep -Eo '\d.\d.\d')
 if [ -z "$version" ]; then
@@ -14,10 +18,6 @@ if [ -z "$version" ]; then
     exit 1
 fi
 filename="${package_name}-$version.zip"
-
-# build
-rm -rf "$build_dir"
-npm run build
 
 # pack
 pushd "$build_dir"
