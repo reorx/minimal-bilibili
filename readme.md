@@ -33,3 +33,4 @@ Minimal Bilibili 重新设计了首页布局，仅包含动态和推荐两列信
 
 操作录屏:
 
+<video src="https://github.com/reorx/minimal-bilibili/assets/405972/53b44286-cf95-45f8-a4a8-d9424e1112c6"></video>
