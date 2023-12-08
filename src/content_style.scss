@@ -80,6 +80,7 @@ body {
 
 /* recommend styles */
 .recommended-container_floor-aside {
+  max-width: 700px;
 
   .recommended-swipe {
     display: none;
@@ -92,11 +93,21 @@ body {
     margin-top: 32px;
     grid-template-columns: repeat(3,1fr);
 
-    height: 416px;
+    height: 394px;
     overflow-y: auto;
     border: 1px solid #aaa;
-    padding: 12px;
+    padding: 20px;  // same as grip-gap
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+    @media screen and (min-width: 1200px) {
+      height: 420px;
+    }
+    @media screen and (min-width: 1400px) {
+      height: 450px;
+    }
+    @media screen and (min-width: 1650px) {
+      height: 470px;
+    }
 
     > div {
       margin-top: 0 !important;
