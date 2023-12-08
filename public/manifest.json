@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Minimal Bilibili",
   "description": "Make Bilibili more minimalistic",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "icons": {
     "16": "icon.png",
     "48": "icon.png",
