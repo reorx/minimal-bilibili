@@ -250,6 +250,7 @@ interface VideoCard {
   // "在当今的文化作品中，末日题材已越发被大家熟悉。丧尸、核平、冻土、水灾......在这些诸多的末日题材中，总有那么一群生存大师，即便身处的环境再差，也要想办法给自己解决“住房”问题。今天我们就来和大家聊聊末日生存该如何解决“住”的问题。"
   desc: string
   // e.g. 1677212230
+  // NOTE pubdate may be earlier than the actual time the video appears in dynamics, use desc.timestamp instead
   pubdate: number
   // duration in seconds
   duration: number
@@ -331,7 +332,7 @@ async function loadDynamics(state: ColumnState, container: Cash, uid: string, ty
             </div>
             <div class="meta">
               <span class="with-sep">${spanIcon('user')}<a href="https://space.bilibili.com/${desc.user_profile?.info.uid}" target="_blank">${desc.user_profile?.info.uname}</a></span
-              ><span class="with-sep">${spanIcon('calendar-time')}${hoursOrMinutesFrom(card.pubdate)}</span
+              ><span class="with-sep">${spanIcon('calendar-time')}${hoursOrMinutesFrom(desc.timestamp)}</span
               ><span class="with-sep">${spanIcon('clock')}${formatDuration(card.duration)}</span
               ><span class="stats">
                 ${spanIcon('thumb-up')}<span class="value">${card.stat.like}</span>
@@ -342,7 +343,7 @@ async function loadDynamics(state: ColumnState, container: Cash, uid: string, ty
             <div class="desc">${description}</div>
           </div>
         `
-        dateStr = formatDate(card.pubdate)
+        dateStr = formatDate(desc.timestamp)
       } else {
         const card = _card as BangumiCard
         const description = card.apiSeasonInfo.title
