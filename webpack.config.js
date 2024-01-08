@@ -86,6 +86,7 @@ function developmentConfig() {
     mode: 'development',
     plugins: [
       new ExtReloader({
+        port: process.env.EXT_RELOADER_PORT || 9110,
         entries: {
           background: 'background',
           contentScript: ['content_script', 'content_style', 'video_content_script', 'video_content_style'],
