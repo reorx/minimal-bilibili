@@ -24,6 +24,11 @@ $autoLoadVideoColumn.on('change', () => {
   store.settings.autoLoadVideoColumn = $autoLoadVideoColumn.prop('checked')
 })
 
+const $blockedWords = $('#v-blocked-words')
+$blockedWords.on('change', () => {
+  store.settings.blockedWords = $blockedWords.val() as string
+})
+
 
 $('#fn-save').on('click', () => {
   chrome.storage.sync.set({
@@ -39,4 +44,5 @@ loadSettings().then((settings) => {
   $showRecommend.prop('checked', store.settings.showRecommend)
   $autoFocus.prop('checked', store.settings.autoFocusSearchBar)
   $autoLoadVideoColumn.prop('checked', store.settings.autoLoadVideoColumn)
+  $blockedWords.val(store.settings.blockedWords)
 })

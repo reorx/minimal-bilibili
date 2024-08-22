@@ -96,7 +96,9 @@ loadSettings().then((settings) => {
     // init columns
     const loadMoreFuncs: Array<() => Promise<void>> = []
 
-    const loadMoreVideos = initDynamicsColumn(container, 'left', '动态', uid, TYPE_LIST.VIDEO)
+    const blockedWords = settings.blockedWords.split(',').map(s => s.trim())
+
+    const loadMoreVideos = initDynamicsColumn(container, 'left', '动态', uid, TYPE_LIST.VIDEO, blockedWords)
     if (settings.autoLoadVideoColumn)
       loadMoreFuncs.push(loadMoreVideos)
 
@@ -285,7 +287,7 @@ interface ColumnState {
   lastDynamicId: string|null
 }
 
-function initDynamicsColumn(container: Cash, name: string, title: string, uid: string, type_list: string) {
+function initDynamicsColumn(container: Cash, name: string, title: string, uid: string, type_list: string, blockedWords: string[]) {
 
   const column = $(`<section class="${name}-column">`).appendTo(container)
   $('<div class="section-title">').text(title).appendTo(column)
@@ -300,17 +302,17 @@ function initDynamicsColumn(container: Cash, name: string, title: string, uid: s
 
   const loadMoreFunc = async () => {
     loadMore.attr('disabled', 'disabled')
-    await loadDynamics(state, items, uid, type_list)
+    await loadDynamics(state, items, uid, type_list, blockedWords)
     loadMore.removeAttr('disabled')
   }
 
   loadMore.on('click', loadMoreFunc)
 
-  loadDynamics(state, items, uid, type_list)
+  loadDynamics(state, items, uid, type_list, blockedWords)
   return loadMoreFunc
 }
 
-async function loadDynamics(state: ColumnState, container: Cash, uid: string, type_list: string) {
+async function loadDynamics(state: ColumnState, container: Cash, uid: string, type_list: string, blockedWords: string[]) {
 
   return fetchDynamics(uid, state.lastDynamicId, type_list).then(data => {
     // console.log('data', data)
@@ -322,6 +324,16 @@ async function loadDynamics(state: ColumnState, container: Cash, uid: string, ty
       let dateStr
       if (desc.bvid) {
         const card = _card as VideoCard
+        let shouldBlock = false
+        for (const word of blockedWords) {
+          if (card.title.toLowerCase().includes(word.toLowerCase())) {
+            console.log(`block video with title ${card.title}, match word ${word}`)
+            shouldBlock = true
+            break
+          }
+        }
+        if (shouldBlock) continue
+
         const description = card.desc
         innerHtml = `
           <a href="https://www.bilibili.com/video/${desc.bvid}" target="_blank" class="seq">${state.dynamicsSeq}</a>
