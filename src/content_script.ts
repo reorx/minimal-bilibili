@@ -96,7 +96,13 @@ loadSettings().then((settings) => {
     // init columns
     const loadMoreFuncs: Array<() => Promise<void>> = []
 
-    const blockedWords = settings.blockedWords.split(',').map(s => s.trim())
+    const blockedWords = settings.blockedWords
+      ? settings.blockedWords
+          .split(",")
+          .map((s) => s.trim())
+          .filter((s) => s !== "")
+      : [];
+    console.log("Processed blockedWords:", blockedWords);
 
     const loadMoreVideos = initDynamicsColumn(container, 'left', '动态', uid, TYPE_LIST.VIDEO, blockedWords)
     if (settings.autoLoadVideoColumn)
