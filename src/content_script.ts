@@ -100,7 +100,7 @@ loadSettings().then((settings) => {
       ? settings.blockedWords
           .split(",")
           .map((s) => s.trim())
-          .filter((s) => s !== "")
+          .filter(Boolean)
       : [];
     console.log("Processed blockedWords:", blockedWords);
 
