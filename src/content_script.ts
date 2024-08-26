@@ -50,13 +50,21 @@ const state: State = {
 
 loadSettings().then((settings) => {
   lg.info('loaded settings', settings)
+  const blockedWords = settings.blockedWords
+    ? settings.blockedWords
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean)
+    : [];
+  console.log("Processed blockedWords:", blockedWords);
+
   if (settings.showRecommend) {
     lg.info('showRecommend is enabled')
 
     // show recommend
     const recContainer = $('.recommended-container_floor-aside')
     $('<div class="section-title">').text('推荐').prependTo(recContainer)
-    observeRecommendAds()
+    observeRecommend(blockedWords)
   }
 
   setTimeout(() => {
@@ -96,13 +104,6 @@ loadSettings().then((settings) => {
     // init columns
     const loadMoreFuncs: Array<() => Promise<void>> = []
 
-    const blockedWords = settings.blockedWords
-      ? settings.blockedWords
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean)
-      : [];
-    console.log("Processed blockedWords:", blockedWords);
 
     const loadMoreVideos = initDynamicsColumn(container, 'left', '动态', uid, TYPE_LIST.VIDEO, blockedWords)
     if (settings.autoLoadVideoColumn)
@@ -432,11 +433,11 @@ function detectScrollToBottom(callback: () => Promise<void>) {
   });
 }
 
-function observeRecommendAds() {
+function observeRecommend(blockedWords: string[]) {
 
   const targetNode = document.querySelector('.recommended-container_floor-aside .container') as HTMLDivElement
 
-  const debouncedRemoveAds = runOnceInTime(() => removeAdsIn(targetNode), 200)
+  const debouncedRemoveAds = runOnceInTime(() => removeAdsAndBlockedWordsIn(targetNode, blockedWords), 2000)
 
   // Callback function to execute when mutations are observed
   const callback: MutationCallback = (mutationsList: MutationRecord[], observer: MutationObserver) => {
@@ -472,9 +473,11 @@ function runOnceInTime(fn: () => void, interval: number): () => void {
   };
 }
 
-function removeAdsIn(el: HTMLElement) {
-  lg.info('removeAds')
+function removeAdsAndBlockedWordsIn(el: HTMLElement, blockedWords: string[]) {
+  lg.info('removeAdsAndBlockedWordsIn', el)
   const $el = $(el)
+
+  // remove ads
   $el.find('.bili-video-card__info--ad, .bili-video-card__info--creative-ad').each((i, el) => {
     const videoCard = $(el).closest('.bili-video-card')
     const parent = videoCard.parent()
@@ -485,4 +488,18 @@ function removeAdsIn(el: HTMLElement) {
     }
   })
   $el.find('.bili-live-card').remove()
+
+  // remove blocked words
+  if (blockedWords.length > 0) {
+    $el.find('.bili-video-card__info--tit').each((i, el) => {
+      // console.log('info el content', el.textContent);
+      const title = el.textContent
+      for (const word of blockedWords) {
+        if (title && title.toLowerCase().includes(word.toLowerCase())) {
+          console.log('remove recommend video:', title)
+          $(el).closest('.feed-card').remove()
+        }
+      }
+    })
+  }
 }
