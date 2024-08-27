@@ -479,13 +479,7 @@ function removeAdsAndBlockedWordsIn(el: HTMLElement, blockedWords: string[]) {
 
   // remove ads
   $el.find('.bili-video-card__info--ad, .bili-video-card__info--creative-ad').each((i, el) => {
-    const videoCard = $(el).closest('.bili-video-card')
-    const parent = videoCard.parent()
-    if (parent.hasClass('feed-card')) {
-      parent.remove()
-    } else {
-      videoCard.remove()
-    }
+    removeVideoCardParent(el)
   })
   $el.find('.bili-live-card').remove()
 
@@ -497,9 +491,19 @@ function removeAdsAndBlockedWordsIn(el: HTMLElement, blockedWords: string[]) {
       for (const word of blockedWords) {
         if (title && title.toLowerCase().includes(word.toLowerCase())) {
           console.log('remove recommend video:', title)
-          $(el).closest('.feed-card').remove()
+          removeVideoCardParent(el)
         }
       }
     })
+  }
+}
+
+function removeVideoCardParent(el: HTMLElement) {
+  const videoCard = $(el).closest('.bili-video-card')
+  const parent = videoCard.parent()
+  if (parent.hasClass('feed-card')) {
+    parent.remove()
+  } else {
+    videoCard.remove()
   }
 }
